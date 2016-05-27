@@ -15,6 +15,9 @@ void MAX30100::begin()
     setLedsPulseWidth(DEFAULT_PULSE_WIDTH);
     setSamplingRate(DEFAULT_SAMPLING_RATE);
     setLedsCurrent(DEFAULT_IR_LED_CURRENT, DEFAULT_RED_LED_CURRENT);
+
+    // uint8_t previous = readRegister(MAX30100_REG_SPO2_CONFIGURATION);
+    // writeRegister(MAX30100_REG_SPO2_CONFIGURATION, previous | MAX30100_SPC_SPO2_HI_RES_EN);
 }
 
 void MAX30100::setMode(Mode mode)
@@ -81,6 +84,8 @@ void MAX30100::readFifoData()
 
     burstRead(MAX30100_REG_FIFO_DATA, buffer, 4);
 
-    rawIRValue = (buffer[0] << 8) | buffer[1];
-    rawRedValue = (buffer[2] << 8) | buffer[3];
+    // Warning: the values are always left-aligned
+    // Note: taking the complement in order to have the QRS sequence properly aligned
+    rawIRValue = 0xffff - ((buffer[0] << 8) | buffer[1]);
+    rawRedValue = 0xffff - ((buffer[2] << 8) | buffer[3]);
 }
