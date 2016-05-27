@@ -6,13 +6,16 @@ MAX30100 hrm;
 
 void setup()
 {
-    pinMode(13, OUTPUT);
+    Serial.begin(115200);
+    hrm.begin();
+    hrm.setMode(MAX30100_MODE_SPO2_HR);
 }
 
 void loop()
 {
-    digitalWrite(13, HIGH);
-    delay(100);
-    digitalWrite(13, LOW);
-    delay(100);
+    hrm.update();
+    Serial.print("IR=");
+    Serial.print(hrm.rawIRValue);
+    Serial.print(" RED=");
+    Serial.println(hrm.rawRedValue);
 }

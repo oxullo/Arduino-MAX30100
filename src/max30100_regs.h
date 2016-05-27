@@ -29,59 +29,54 @@
 #define MAX30100_MC_TEMP_EN                     (1 << 3)
 #define MAX30100_MC_RESET                       (1 << 6)
 #define MAX30100_MC_SHDN                        (1 << 7)
+typedef enum Mode {
+    MAX30100_MODE_HRONLY    = 0x02,
+    MAX30100_MODE_SPO2_HR   = 0x03
+} Mode;
 
 // SpO2 Configuration register
 // Check tables 8 and 9, p19 of the MAX30100 datasheet to see the permissible
 // combinations of sampling rates and pulse widths
 #define MAX30100_REG_SPO2_CONFIGURATION         0x07
 #define MAX30100_SPC_SPO2_HI_RES_EN             (1 << 6)
-#define MAX30100_SPC_RATE_50HZ                  0x00
-#define MAX30100_SPC_RATE_100HZ                 0x01
-#define MAX30100_SPC_RATE_167HZ                 0x02
-#define MAX30100_SPC_RATE_200HZ                 0x03
-#define MAX30100_SPC_RATE_400HZ                 0x04
-#define MAX30100_SPC_RATE_600HZ                 0x05
-#define MAX30100_SPC_RATE_800HZ                 0x06
-#define MAX30100_SPC_RATE_1000HZ                0x07
-#define MAX30100_SPC_PW_200US_13BITS            0x00
-#define MAX30100_SPC_PW_400US_14BITS            0x01
-#define MAX30100_SPC_PW_800US_15BITS            0x02
-#define MAX30100_SPC_PW_1600US_16BITS           0x03
+typedef enum SamplingRate {
+    MAX30100_SAMPRATE_50HZ      = 0x00,
+	MAX30100_SAMPRATE_100HZ     = 0x01,
+	MAX30100_SAMPRATE_167HZ     = 0x02,
+	MAX30100_SAMPRATE_200HZ     = 0x03,
+	MAX30100_SAMPRATE_400HZ     = 0x04,
+	MAX30100_SAMPRATE_600HZ     = 0x05,
+	MAX30100_SAMPRATE_800HZ     = 0x06,
+	MAX30100_SAMPRATE_1000HZ    = 0x07
+} SamplingRate;
+
+typedef enum LEDPulseWidth {
+    MAX30100_SPC_PW_200US_13BITS    = 0x00,
+    MAX30100_SPC_PW_400US_14BITS    = 0x01,
+    MAX30100_SPC_PW_800US_15BITS    = 0x02,
+    MAX30100_SPC_PW_1600US_16BITS   = 0x03
+} LEDPulseWidth;
 
 // LED Configuration register
 #define MAX30100_REG_LED_CONFIGURATION          0x09
-#define MAX30100_LC_IR_CURR_0MA                 0x00
-#define MAX30100_LC_IR_CURR_4_4MA               0x01
-#define MAX30100_LC_IR_CURR_7_6MA               0x02
-#define MAX30100_LC_IR_CURR_11MA                0x03
-#define MAX30100_LC_IR_CURR_14_2MA              0x04
-#define MAX30100_LC_IR_CURR_17_4MA              0x05
-#define MAX30100_LC_IR_CURR_20_8MA              0x06
-#define MAX30100_LC_IR_CURR_24MA                0x07
-#define MAX30100_LC_IR_CURR_27_1MA              0x08
-#define MAX30100_LC_IR_CURR_30_6MA              0x09
-#define MAX30100_LC_IR_CURR_33_8MA              0x0a
-#define MAX30100_LC_IR_CURR_37MA                0x0b
-#define MAX30100_LC_IR_CURR_40_2MA              0x0c
-#define MAX30100_LC_IR_CURR_43_6MA              0x0d
-#define MAX30100_LC_IR_CURR_46_8MA              0x0e
-#define MAX30100_LC_IR_CURR_50MA                0x0f
-#define MAX30100_LC_RED_CURR_0MA                0x00
-#define MAX30100_LC_RED_CURR_4_4MA              0x10
-#define MAX30100_LC_RED_CURR_7_6MA              0x20
-#define MAX30100_LC_RED_CURR_11MA               0x30
-#define MAX30100_LC_RED_CURR_14_2MA             0x40
-#define MAX30100_LC_RED_CURR_17_4MA             0x50
-#define MAX30100_LC_RED_CURR_20_8MA             0x60
-#define MAX30100_LC_RED_CURR_24MA               0x70
-#define MAX30100_LC_RED_CURR_27_1MA             0x80
-#define MAX30100_LC_RED_CURR_30_6MA             0x90
-#define MAX30100_LC_RED_CURR_33_8MA             0xa0
-#define MAX30100_LC_RED_CURR_37MA               0xb0
-#define MAX30100_LC_RED_CURR_40_2MA             0xc0
-#define MAX30100_LC_RED_CURR_43_6MA             0xd0
-#define MAX30100_LC_RED_CURR_46_8MA             0xe0
-#define MAX30100_LC_RED_CURR_50MA               0xf0
+typedef enum LEDCurrent {
+	MAX30100_LED_CURR_0MA      = 0x00,
+	MAX30100_LED_CURR_4_4MA    = 0x01,
+	MAX30100_LED_CURR_7_6MA    = 0x02,
+	MAX30100_LED_CURR_11MA     = 0x03,
+	MAX30100_LED_CURR_14_2MA   = 0x04,
+	MAX30100_LED_CURR_17_4MA   = 0x05,
+	MAX30100_LED_CURR_20_8MA   = 0x06,
+	MAX30100_LED_CURR_24MA     = 0x07,
+	MAX30100_LED_CURR_27_1MA   = 0x08,
+	MAX30100_LED_CURR_30_6MA   = 0x09,
+	MAX30100_LED_CURR_33_8MA   = 0x0a,
+	MAX30100_LED_CURR_37MA     = 0x0b,
+	MAX30100_LED_CURR_40_2MA   = 0x0c,
+	MAX30100_LED_CURR_43_6MA   = 0x0d,
+	MAX30100_LED_CURR_46_8MA   = 0x0e,
+	MAX30100_LED_CURR_50MA     = 0x0f
+} LEDCurrent;
 
 // Temperature integer part register
 #define MAX30100_REG_TEMPERATURE_DATA_INT       0x16
