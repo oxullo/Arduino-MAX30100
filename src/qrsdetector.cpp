@@ -11,13 +11,9 @@ QRSDetector::QRSDetector() :
 {
 }
 
-float QRSDetector::addSample(float sample)
+void QRSDetector::addSample(float sample)
 {
-    float filteredValue = filter.step(sample);
-
-    checkForBeat(filteredValue);
-
-    return filteredValue;
+    checkForBeat(sample);
 }
 
 float QRSDetector::getHeartRate()

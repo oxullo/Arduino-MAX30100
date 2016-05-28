@@ -2,9 +2,11 @@
 
 #include "max30100.h"
 #include "qrsdetector.h"
+#include "filter.h"
 
 MAX30100 hrm;
 QRSDetector qrsDetector;
+FilterBeBp2 filter;
 
 void setup()
 {
@@ -21,7 +23,8 @@ void loop()
 
     if (millis() - t1 > 10) {
         hrm.update();
-        float filteredValue = qrsDetector.addSample(hrm.rawIRValue);
+        float filteredValue = filter.step(hrm.rawIRValue);
+        qrsDetector.addSample(filteredValue);
 
         Serial.print("R:");
         Serial.print(filteredValue);
