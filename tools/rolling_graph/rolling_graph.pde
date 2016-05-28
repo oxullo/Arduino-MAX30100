@@ -34,24 +34,21 @@ void draw ()
   
   for (int s=0 ; s < CHANNELS ; ++s) {
     stroke(colors[s]);
-    
+
     float[] samples = series[s];
     float maxv, minv;
+    float seriesMax = max(samples);
     
     if (VALUE_MAX == -1) {
       maxv = max(samples);
     } else {
       maxv = VALUE_MAX;
-      float samplesMax = max(samples);
-      line(0, samplesMax, WIDTH, samplesMax);
     }
     
     if (VALUE_MIN == -1) {
       minv = min(samples);
     } else {
       minv = VALUE_MIN;
-      float samplesMin = min(samples);
-      line(0, samplesMin, WIDTH, samplesMin);
     }
     
     text("ch " + s + " max:" + maxv, 0, 8 + 10 * s);
@@ -59,10 +56,18 @@ void draw ()
       maxv = minv + 1;
     }
     
+    boolean maxDisplayed = false;
     for (int i = 0 ; i < WIDTH ; ++i) {
       if (i > 0) {
-        line(i - 1, HEIGHT - map(samples[i-1], minv, maxv, 0, HEIGHT),
-             i, HEIGHT - map(samples[i], minv, maxv, 0, HEIGHT));
+        float ipy = HEIGHT - map(samples[i-1], minv, maxv, 0, HEIGHT);
+        float iy = HEIGHT - map(samples[i], minv, maxv, 0, HEIGHT);
+        
+        if (abs(samples[i] - seriesMax) < 0.001 && !maxDisplayed) {
+          text("v=" + samples[i], i, iy);
+          maxDisplayed = true;
+        }
+          
+        line(i - 1, ipy, i, iy);
       }
     }
   }
