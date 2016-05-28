@@ -8,12 +8,15 @@
 
 #include <stdint.h>
 
-#define QRSDETECTOR_INIT_HOLDOFF                2000
-#define QRSDETECTOR_THRESHOLD_DECAY_FACTOR      0.99
-#define QRSDETECTOR_MASKING_HOLDOFF             200
-#define QRSDETECTOR_HRFILTER_ALPHA              0.5
-#define QRSDETECTOR_MIN_THRESHOLD               80
-#define QRSDETECTOR_INVALID_READOUT_DELAY       2000
+#define QRSDETECTOR_INIT_HOLDOFF                2000    // in ms, how long to wait before counting
+#define QRSDETECTOR_MASKING_HOLDOFF             200     // in ms, non-retriggerable window after beat detection
+#define QRSDETECTOR_BPFILTER_ALPHA              0.5     // EMA factor for the beat period value
+#define QRSDETECTOR_MIN_THRESHOLD               30      // minimum threshold (filtered) value
+#define QRSDETECTOR_MAX_THRESHOLD               500     // maximumg threshold (filtered) value
+#define QRSDETECTOR_THRESHOLD_FALLOFF_TARGET    0.3     // thr chasing factor of the max value when beat
+#define QRSDETECTOR_THRESHOLD_DECAY_FACTOR      0.99    // thr chasing factor when no beat
+#define QRSDETECTOR_INVALID_READOUT_DELAY       2000    // in ms, no-beat time to cause a reset
+#define QRSDETECTOR_SAMPLES_PERIOD              10      // in ms, 1/Fs
 
 
 typedef enum QRSDetectorState {
@@ -70,7 +73,8 @@ private:
     FilterBeBp2 filter;
     QRSDetectorState state;
     float threshold;
-    float heartRate;
+    float beatPeriod;
+    float lastMaxValue;
     uint32_t tsLastPulse;
 };
 

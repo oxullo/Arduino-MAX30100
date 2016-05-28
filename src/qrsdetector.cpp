@@ -5,7 +5,8 @@
 QRSDetector::QRSDetector() :
     state(QRSDETECTOR_STATE_INIT),
     threshold(QRSDETECTOR_MIN_THRESHOLD),
-    heartRate(0),
+    beatPeriod(0),
+    lastMaxValue(0),
     tsLastPulse(0)
 {
 }
@@ -21,7 +22,11 @@ float QRSDetector::addSample(float sample)
 
 float QRSDetector::getHeartRate()
 {
-    return heartRate;
+    if (beatPeriod != 0) {
+        return 1 / beatPeriod * 1000 * 60;
+    } else {
+        return 0;
+    }
 }
 
 float QRSDetector::getCurrentThreshold()
@@ -40,12 +45,14 @@ void QRSDetector::checkForBeat(float sample)
 
         case QRSDETECTOR_STATE_WAITING:
             if (sample > threshold) {
-                threshold = sample;
+                threshold = min(sample, QRSDETECTOR_MAX_THRESHOLD);
                 state = QRSDETECTOR_STATE_FOLLOWING_SLOPE;
             }
 
+            // Tracking lost, resetting
             if (millis() - tsLastPulse > QRSDETECTOR_INVALID_READOUT_DELAY) {
-                heartRate = 0;
+                beatPeriod = 0;
+                lastMaxValue = 0;
             }
 
             decreaseThreshold();
@@ -53,14 +60,15 @@ void QRSDetector::checkForBeat(float sample)
 
         case QRSDETECTOR_STATE_FOLLOWING_SLOPE:
             if (sample > threshold) {
-                threshold = sample;
+                threshold = min(sample, QRSDETECTOR_MAX_THRESHOLD);
             } else {
+                // Found a beat
+                lastMaxValue = sample;
                 state = QRSDETECTOR_STATE_MASKING;
                 float delta = millis() - tsLastPulse;
                 if (delta) {
-                    float presentHeartRate = 1 / delta * 1000 * 60;
-                    heartRate = QRSDETECTOR_HRFILTER_ALPHA * presentHeartRate +
-                            (1 - QRSDETECTOR_HRFILTER_ALPHA) * heartRate;
+                    beatPeriod = QRSDETECTOR_BPFILTER_ALPHA * delta +
+                            (1 - QRSDETECTOR_BPFILTER_ALPHA) * beatPeriod;
                 }
 
                 tsLastPulse = millis();
@@ -78,7 +86,15 @@ void QRSDetector::checkForBeat(float sample)
 
 void QRSDetector::decreaseThreshold()
 {
-    threshold *= QRSDETECTOR_THRESHOLD_DECAY_FACTOR;
+    // When a valid pulse rate readout is present, target the
+    if (lastMaxValue > 0 && beatPeriod > 0) {
+        threshold -= lastMaxValue * (1 - QRSDETECTOR_THRESHOLD_FALLOFF_TARGET) /
+                (beatPeriod / QRSDETECTOR_SAMPLES_PERIOD);
+    } else {
+        // Asymptotic decay
+        threshold *= QRSDETECTOR_THRESHOLD_DECAY_FACTOR;
+    }
+
     if (threshold < QRSDETECTOR_MIN_THRESHOLD) {
         threshold = QRSDETECTOR_MIN_THRESHOLD;
     }
