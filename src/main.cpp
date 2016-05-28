@@ -1,11 +1,11 @@
 #include <Arduino.h>
 
 #include "max30100.h"
-#include "qrsdetector.h"
+#include "pulsedetector.h"
 #include "filter.h"
 
 MAX30100 hrm;
-QRSDetector qrsDetector;
+PulseDetector pulseDetector;
 FilterBeBp2 filter;
 
 void setup()
@@ -24,19 +24,19 @@ void loop()
     if (millis() - t1 > 10) {
         hrm.update();
         float filteredValue = filter.step(hrm.rawIRValue);
-        qrsDetector.addSample(filteredValue);
+        pulseDetector.addSample(filteredValue);
 
         Serial.print("R:");
         Serial.print(filteredValue);
         Serial.print(" ");
-        Serial.println(qrsDetector.getCurrentThreshold());
+        Serial.println(pulseDetector.getCurrentThreshold());
 
         t1 = millis();
     }
 
     if (millis() - t2 > 1000) {
         Serial.print("H:");
-        Serial.println(qrsDetector.getHeartRate());
+        Serial.println(pulseDetector.getHeartRate());
 
         t2 = millis();
     }
