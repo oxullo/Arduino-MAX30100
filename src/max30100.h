@@ -21,6 +21,7 @@ public:
     void setLedsPulseWidth(LEDPulseWidth ledPulseWidth);
     void setSamplingRate(SamplingRate samplingRate);
     void setLedsCurrent(LEDCurrent irLedCurrent, LEDCurrent redLedCurrent);
+    void setHighresModeEnabled(bool enabled);
     void update();
 
     uint16_t rawIRValue;

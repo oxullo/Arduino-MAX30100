@@ -15,9 +15,7 @@ void MAX30100::begin()
     setLedsPulseWidth(DEFAULT_PULSE_WIDTH);
     setSamplingRate(DEFAULT_SAMPLING_RATE);
     setLedsCurrent(DEFAULT_IR_LED_CURRENT, DEFAULT_RED_LED_CURRENT);
-
-    // uint8_t previous = readRegister(MAX30100_REG_SPO2_CONFIGURATION);
-    // writeRegister(MAX30100_REG_SPO2_CONFIGURATION, previous | MAX30100_SPC_SPO2_HI_RES_EN);
+    setHighresModeEnabled(true);
 }
 
 void MAX30100::setMode(Mode mode)
@@ -40,6 +38,16 @@ void MAX30100::setSamplingRate(SamplingRate samplingRate)
 void MAX30100::setLedsCurrent(LEDCurrent irLedCurrent, LEDCurrent redLedCurrent)
 {
     writeRegister(MAX30100_REG_LED_CONFIGURATION, redLedCurrent << 4 | irLedCurrent);
+}
+
+void MAX30100::setHighresModeEnabled(bool enabled)
+{
+    uint8_t previous = readRegister(MAX30100_REG_SPO2_CONFIGURATION);
+    if (enabled) {
+        writeRegister(MAX30100_REG_SPO2_CONFIGURATION, previous | MAX30100_SPC_SPO2_HI_RES_EN);
+    } else {
+        writeRegister(MAX30100_REG_SPO2_CONFIGURATION, previous & ~MAX30100_SPC_SPO2_HI_RES_EN);
+    }
 }
 
 void MAX30100::update()
