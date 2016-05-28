@@ -24,7 +24,8 @@ typedef enum QRSDetectorState {
 } QRSDetectorState;
 
 // http://www.schwietering.com/jayduino/filtuino/
-// Band pass bessel filter order=2 alpha1=0.025 alpha2=0.055
+// Band pass bessel filter order=2 alpha1=0.05 alpha2=0.15
+// Fc=100Hz -> Fl=5Hz, Fh=15Hz
 class  FilterBeBp2
 {
 	public:
