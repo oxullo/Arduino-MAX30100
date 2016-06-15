@@ -5,8 +5,7 @@ final int HEIGHT = 600;
 final int CHANNELS = 2;
 final String serialPort = "/dev/tty.usbmodemFD13131";
 final color[] colors = {color(0, 0, 0), color(255, 0, 0), color(0, 255, 0), color(0, 0, 255)};
-final int VALUE_MAX = 500;
-final int VALUE_MIN = -500;
+final int ABSMAX = 1000;
 
 float[][] series = new float[CHANNELS][WIDTH];
 float heartRate = 0;
@@ -44,30 +43,32 @@ void draw ()
 {
   background(255);
   
+  stroke(30);
+  
+  line(0, height/2, width, height/2);
+
+  float maxv=0, minv;
+  for (int s=0 ; s < CHANNELS ; ++s) {
+    float[] samples = series[s];
+    maxv = max(maxv, abs(max(samples)), abs(min(samples)));
+    if (ABSMAX != -1) {
+      maxv = min(maxv, ABSMAX);
+    }
+  }
+
+  minv = -maxv;
+
   for (int s=0 ; s < CHANNELS ; ++s) {
     stroke(colors[s]);
 
     float[] samples = series[s];
-    float maxv, minv;
     float seriesMax = max(samples);
-    
-    if (VALUE_MAX == -1) {
-      maxv = max(samples);
-    } else {
-      maxv = VALUE_MAX;
-    }
-    
-    if (VALUE_MIN == -1) {
-      minv = min(samples);
-    } else {
-      minv = VALUE_MIN;
-    }
-    
+/*
     text("ch " + s + " max:" + maxv, 0, 8 + 10 * s);
     if (minv == maxv) {
       maxv = minv + 1;
     }
-    
+*/    
     boolean maxDisplayed = false;
     for (int i = 0 ; i < WIDTH ; ++i) {
       if (i > 0) {
