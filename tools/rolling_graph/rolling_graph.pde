@@ -3,7 +3,7 @@ import processing.serial.*;
 final int WIDTH = 1200;
 final int HEIGHT = 600;
 final int CHANNELS = 2;
-final String serialPort = "/dev/tty.usbmodemFD131";
+final String serialPort = "/dev/tty.usbmodemFD13131";
 final color[] colors = {color(0, 0, 0), color(255, 0, 0), color(0, 255, 0), color(0, 0, 255)};
 final int VALUE_MAX = 500;
 final int VALUE_MIN = -500;
@@ -21,7 +21,19 @@ void settings()
 
 void setup ()
 {
-  myPort = new Serial(this, serialPort, 115200);
+  String attemptPort = serialPort;
+  
+  for (int i=0 ; i < Serial.list().length ; ++i) {
+    String port = Serial.list()[i];
+    if (port.matches(".+tty\\.usbmodem.+")) {
+      attemptPort = port;
+      break;
+    }
+  }
+  
+  println("Opening port " + attemptPort);
+  
+  myPort = new Serial(this, attemptPort, 115200);
   
   stroke(0);
   fill(0);
