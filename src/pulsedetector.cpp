@@ -29,9 +29,9 @@ PulseDetector::PulseDetector() :
 {
 }
 
-void PulseDetector::addSample(float sample)
+bool PulseDetector::addSample(float sample)
 {
-    checkForBeat(sample);
+    return checkForBeat(sample);
 }
 
 float PulseDetector::getHeartRate()
@@ -48,8 +48,10 @@ float PulseDetector::getCurrentThreshold()
     return threshold;
 }
 
-void PulseDetector::checkForBeat(float sample)
+bool PulseDetector::checkForBeat(float sample)
 {
+    bool beatDetected = false;
+
     switch (state) {
         case PULSEDETECTOR_STATE_INIT:
             if (millis() > PULSEDETECTOR_INIT_HOLDOFF) {
@@ -83,6 +85,7 @@ void PulseDetector::checkForBeat(float sample)
         case PULSEDETECTOR_STATE_MAYBE_DETECTED:
             if (sample + PULSEDETECTOR_STEP_RESILIENCY < threshold) {
                 // Found a beat
+                beatDetected = true;
                 lastMaxValue = sample;
                 state = PULSEDETECTOR_STATE_MASKING;
                 float delta = millis() - tsLastPulse;
@@ -104,6 +107,8 @@ void PulseDetector::checkForBeat(float sample)
             decreaseThreshold();
             break;
     }
+
+    return beatDetected;
 }
 
 void PulseDetector::decreaseThreshold()

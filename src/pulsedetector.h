@@ -46,12 +46,12 @@ class PulseDetector
 {
 public:
     PulseDetector();
-    void addSample(float sample);
+    bool addSample(float sample);
     float getHeartRate();
     float getCurrentThreshold();
 
 private:
-    void checkForBeat(float value);
+    bool checkForBeat(float value);
     void decreaseThreshold();
 
     PulseDetectorState state;
