@@ -9,6 +9,7 @@ final int ABSMAX = -1;
 
 float[][] series = new float[CHANNELS][WIDTH];
 float heartRate = 0;
+int spO2 = 0;
 boolean beatDetected = false;
 int ptr = 0;
 
@@ -93,6 +94,7 @@ void draw ()
   }
   
   text("Rate: " + heartRate, 200, 8);
+  text("SpO2: " + spO2 + "%", 200, 18);
 }
   
 void serialEvent (Serial myPort)
@@ -121,7 +123,9 @@ void serialEvent (Serial myPort)
     heartRate = float(sLine.substring(2));
   } else if (sLine.substring(0, 2).equals("B:")) {
     beatDetected = true;
-  }else if (sLine.substring(0, 2).equals("C:")) {
+  } else if (sLine.substring(0, 2).equals("C:")) {
     println(sLine);
+  } else if (sLine.substring(0, 2).equals("O:")) {
+    spO2 = int(float(sLine.substring(2)));
   }
 }

@@ -30,6 +30,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define DC_REMOVER_ALPHA                    0.95
 
 MAX30100 hrm;
+// SaO2 Look-up Table
+// http://www.ti.com/lit/an/slaa274b/slaa274b.pdf
+const uint8_t spO2lookup[43] = {100,100,100,100,99,99,99,99,99,99,98,98,98,98,
+                                98,97,97,97,97,97,97,96,96,96,96,96,96,95,95,
+                                95,95,95,95,94,94,94,94,94,93,93,93,93,93};
 
 void setup()
 {
@@ -45,19 +50,50 @@ void loop()
     static uint32_t t2 = 0;
     static uint32_t t3 = 0;
     static uint32_t tsLastCurrentAdjustment = 0;
+    static uint8_t beatsDetectedNum = 0;
+    static uint32_t samplesRecorded = 0;
     static PulseDetector pulseDetector;
     static DCRemover irDCRemover(DC_REMOVER_ALPHA);
     static DCRemover redDCRemover(DC_REMOVER_ALPHA);
     static FilterBuLp1 lpf;
     static uint8_t redLedPower = (uint8_t)RED_LED_CURRENT_START;
+    static float irACValueSqSum = 0;
+    static float redACValueSqSum = 0;
 
     if (millis() - t1 > 1.0 / SAMPLING_FREQUENCY * 1000.0) {
         hrm.update();
         float irACValue = irDCRemover.step(hrm.rawIRValue);
         float redACValue = redDCRemover.step(hrm.rawRedValue);
 
-        // The signal is fed to the beat detector is mirrored since the cleanest monotonic spike is below zero
+        // The signal fed to the beat detector is mirrored since the cleanest monotonic spike is below zero
         bool beatDetected = pulseDetector.addSample(lpf.step(-irACValue));
+
+        if (pulseDetector.getHeartRate() > 0) {
+            irACValueSqSum += irACValue * irACValue;
+            redACValueSqSum += redACValue * redACValue;
+            ++samplesRecorded;
+
+            if (beatDetected) {
+                ++beatsDetectedNum;
+                if (beatsDetectedNum == 3) {
+                    float acSqRatio = 100.0 * log(redACValueSqSum/samplesRecorded) / log(irACValueSqSum/samplesRecorded);
+                    uint8_t index = 0;
+
+                    if (acSqRatio > 66) {
+                        index = (uint8_t)acSqRatio - 66;
+                    } else if (acSqRatio > 50) {
+                        index = (uint8_t)acSqRatio - 50;
+                    }
+                    Serial.print("O:");
+                    Serial.println(spO2lookup[index]);
+
+                    samplesRecorded = 0;
+                    redACValueSqSum = 0;
+                    irACValueSqSum = 0;
+                    beatsDetectedNum = 0;
+                }
+            }
+        }
 
         Serial.print("R:");
         Serial.print(irACValue);
