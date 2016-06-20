@@ -20,7 +20,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define PULSEOXIMETER_H
 
 #define SAMPLING_FREQUENCY                  100
-#define HEARTRATE_REPORTING_PERIOD_MS       1000
 #define CURRENT_ADJUSTMENT_PERIOD_MS        500
 #define IR_LED_CURRENT                      MAX30100_LED_CURR_50MA
 #define RED_LED_CURRENT_START               MAX30100_LED_CURR_27_1MA
@@ -39,10 +38,16 @@ public:
 
     void begin();
     void update();
+    float getHeartRate();
+    uint8_t getSpO2();
 
 private:
-    uint32_t t1;
-    uint32_t t2;
+    static const uint8_t spO2LUT[43];
+
+    void checkSample();
+    void checkCurrentBias();
+
+    uint32_t tsLastSample;
     uint32_t t3;
     uint32_t tsLastCurrentAdjustment;
     uint8_t beatsDetectedNum;
@@ -54,6 +59,7 @@ private:
     uint8_t redLedPower;
     float irACValueSqSum;
     float redACValueSqSum;
+    uint8_t spO2;
     MAX30100 hrm;
 };
 #endif

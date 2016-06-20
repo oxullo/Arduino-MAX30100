@@ -22,21 +22,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 // SaO2 Look-up Table
 // http://www.ti.com/lit/an/slaa274b/slaa274b.pdf
-const uint8_t spO2lookup[43] = {100,100,100,100,99,99,99,99,99,99,98,98,98,98,
-                                98,97,97,97,97,97,97,96,96,96,96,96,96,95,95,
-                                95,95,95,95,94,94,94,94,94,93,93,93,93,93};
+const uint8_t PulseOximeter::spO2LUT[43] = {100,100,100,100,99,99,99,99,99,99,98,98,98,98,
+                                               98,97,97,97,97,97,97,96,96,96,96,96,96,95,95,
+                                               95,95,95,95,94,94,94,94,94,93,93,93,93,93};
 
 
 PulseOximeter::PulseOximeter() :
-    t1(0),
-    t2(0),
+    tsLastSample(0),
     t3(0),
     tsLastCurrentAdjustment(0),
     beatsDetectedNum(0),
     samplesRecorded(0),
     redLedPower((uint8_t)RED_LED_CURRENT_START),
     irACValueSqSum(0),
-    redACValueSqSum(0)
+    redACValueSqSum(0),
+    spO2(0)
 {
 }
 
@@ -52,7 +52,23 @@ void PulseOximeter::begin()
 
 void PulseOximeter::update()
 {
-    if (millis() - t1 > 1.0 / SAMPLING_FREQUENCY * 1000.0) {
+    checkSample();
+    checkCurrentBias();
+}
+
+float PulseOximeter::getHeartRate()
+{
+    return beatDetector.getRate();
+}
+
+uint8_t PulseOximeter::getSpO2()
+{
+    return spO2;
+}
+
+void PulseOximeter::checkSample()
+{
+    if (millis() - tsLastSample > 1.0 / SAMPLING_FREQUENCY * 1000.0) {
         hrm.update();
         float irACValue = irDCRemover.step(hrm.rawIRValue);
         float redACValue = redDCRemover.step(hrm.rawRedValue);
@@ -76,8 +92,7 @@ void PulseOximeter::update()
                     } else if (acSqRatio > 50) {
                         index = (uint8_t)acSqRatio - 50;
                     }
-                    Serial.print("O:");
-                    Serial.println(spO2lookup[index]);
+                    spO2 = spO2LUT[index];
 
                     samplesRecorded = 0;
                     redACValueSqSum = 0;
@@ -95,16 +110,12 @@ void PulseOximeter::update()
         if (beatDetected) {
             Serial.println("B:1");
         }
-        t1 = millis();
+        tsLastSample = millis();
     }
+}
 
-    if (millis() - t2 > HEARTRATE_REPORTING_PERIOD_MS) {
-        Serial.print("H:");
-        Serial.println(beatDetector.getRate());
-
-        t2 = millis();
-    }
-
+void PulseOximeter::checkCurrentBias()
+{
     // Follower that adjusts the red led current in order to have comparable DC baselines between
     // red and IR leds. The numbers are really magic: the less possible to avoid oscillations
     if (millis() - t3 > CURRENT_ADJUSTMENT_PERIOD_MS) {

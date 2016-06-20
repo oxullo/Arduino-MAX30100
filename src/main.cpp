@@ -20,7 +20,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "pulseoximeter.h"
 
+#define REPORTING_PERIOD_MS     1000
+
 PulseOximeter pox;
+uint32_t tsLastReport = 0;
 
 void setup()
 {
@@ -31,4 +34,15 @@ void setup()
 void loop()
 {
     pox.update();
+
+    if (millis() - tsLastReport > REPORTING_PERIOD_MS) {
+        Serial.print("H:");
+        Serial.println(pox.getHeartRate());
+
+        Serial.print("O:");
+        Serial.println(pox.getSpO2());
+
+
+        tsLastReport = millis();
+    }
 }
