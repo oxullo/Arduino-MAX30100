@@ -5,10 +5,11 @@ final int HEIGHT = 600;
 final int CHANNELS = 2;
 final String serialPort = "/dev/tty.usbmodemFD13131";
 final color[] colors = {color(0, 0, 0), color(255, 0, 0), color(0, 255, 0), color(0, 0, 255)};
-final int ABSMAX = 1000;
+final int ABSMAX = -1;
 
 float[][] series = new float[CHANNELS][WIDTH];
 float heartRate = 0;
+boolean beatDetected = false;
 int ptr = 0;
 
 Serial myPort;
@@ -41,7 +42,12 @@ void setup ()
 
 void draw ()
 {
-  background(255);
+  if (beatDetected) {
+    background(255, 200, 200);
+    beatDetected = false;
+  } else {
+    background(255);
+  }
   
   stroke(30);
   
@@ -56,6 +62,10 @@ void draw ()
     }
   }
 
+  // Avoids map() errors
+  if (maxv == 0) {
+    maxv = 1;
+  }
   minv = -maxv;
 
   for (int s=0 ; s < CHANNELS ; ++s) {
@@ -63,12 +73,9 @@ void draw ()
 
     float[] samples = series[s];
     float seriesMax = max(samples);
-/*
-    text("ch " + s + " max:" + maxv, 0, 8 + 10 * s);
-    if (minv == maxv) {
-      maxv = minv + 1;
-    }
-*/    
+    
+    text("ch " + s + " cur:" + samples[ptr] + " max:" + seriesMax + " min:" + min(samples), 0, 8 + 10 * s);
+
     boolean maxDisplayed = false;
     for (int i = 0 ; i < WIDTH ; ++i) {
       if (i > 0) {
@@ -85,7 +92,7 @@ void draw ()
     }
   }
   
-  text("Rate: " + heartRate, 100, 8);
+  text("Rate: " + heartRate, 200, 8);
 }
   
 void serialEvent (Serial myPort)
@@ -97,7 +104,7 @@ void serialEvent (Serial myPort)
   }
 
   if (sLine.substring(0, 2).equals("R:")) {
-    String[] sValues = split(sLine.substring(2), ' ');
+    String[] sValues = split(sLine.substring(2), ',');
   
     for (int i=0 ; i < sValues.length ; ++i) {
       float sample = float(sValues[i]);
@@ -112,5 +119,9 @@ void serialEvent (Serial myPort)
     ptr = (ptr + 1) % WIDTH;
   } else if (sLine.substring(0, 2).equals("H:")) {
     heartRate = float(sLine.substring(2));
+  } else if (sLine.substring(0, 2).equals("B:")) {
+    beatDetected = true;
+  }else if (sLine.substring(0, 2).equals("C:")) {
+    println(sLine);
   }
 }

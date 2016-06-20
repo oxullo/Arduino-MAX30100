@@ -22,40 +22,82 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "pulsedetector.h"
 #include "filter.h"
 
+#define SAMPLING_FREQUENCY                  100
+#define HEARTRATE_REPORTING_PERIOD_MS       1000
+#define CURRENT_ADJUSTMENT_PERIOD_MS        500
+#define IR_LED_CURRENT                      MAX30100_LED_CURR_50MA
+#define RED_LED_CURRENT_START               MAX30100_LED_CURR_27_1MA
+#define DC_REMOVER_ALPHA                    0.95
+
 MAX30100 hrm;
-PulseDetector pulseDetector;
-FilterBeBp2 filter;
 
 void setup()
 {
     Serial.begin(115200);
     hrm.begin();
-    //hrm.setMode(MAX30100_MODE_SPO2_HR);
-    //hrm.setLedsCurrent(MAX30100_LED_CURR_11MA, MAX30100_LED_CURR_11MA);
+    hrm.setMode(MAX30100_MODE_SPO2_HR);
+    hrm.setLedsCurrent(IR_LED_CURRENT, RED_LED_CURRENT_START);
 }
 
 void loop()
 {
     static uint32_t t1 = 0;
     static uint32_t t2 = 0;
+    static uint32_t t3 = 0;
+    static uint32_t tsLastCurrentAdjustment = 0;
+    static PulseDetector pulseDetector;
+    static DCRemover irDCRemover(DC_REMOVER_ALPHA);
+    static DCRemover redDCRemover(DC_REMOVER_ALPHA);
+    static FilterBuLp1 lpf;
+    static uint8_t redLedPower = (uint8_t)RED_LED_CURRENT_START;
 
-    if (millis() - t1 > 10) {
+    if (millis() - t1 > 1.0 / SAMPLING_FREQUENCY * 1000.0) {
         hrm.update();
-        float filteredValue = filter.step(hrm.rawIRValue);
-        pulseDetector.addSample(filteredValue);
+        float irACValue = irDCRemover.step(hrm.rawIRValue);
+        float redACValue = redDCRemover.step(hrm.rawRedValue);
+
+        // The signal is fed to the beat detector is mirrored since the cleanest monotonic spike is below zero
+        bool beatDetected = pulseDetector.addSample(lpf.step(-irACValue));
 
         Serial.print("R:");
-        Serial.print(filteredValue);
-        Serial.print(" ");
-        Serial.println(pulseDetector.getCurrentThreshold());
+        Serial.print(irACValue);
+        Serial.print(",");
+        Serial.println(redACValue);
 
+        if (beatDetected) {
+            Serial.println("B:1");
+        }
         t1 = millis();
     }
 
-    if (millis() - t2 > 1000) {
+    if (millis() - t2 > HEARTRATE_REPORTING_PERIOD_MS) {
         Serial.print("H:");
         Serial.println(pulseDetector.getHeartRate());
 
         t2 = millis();
+    }
+
+    // Follower that adjusts the red led current in order to have comparable DC baselines between
+    // red and IR leds. The numbers are really magic: the less possible to avoid oscillations
+    if (millis() - t3 > CURRENT_ADJUSTMENT_PERIOD_MS) {
+        bool changed = false;
+        if (irDCRemover.getDCW() - redDCRemover.getDCW() > 70000 && redLedPower < MAX30100_LED_CURR_50MA) {
+            ++redLedPower;
+            changed = true;
+        } else if (redDCRemover.getDCW() - irDCRemover.getDCW() > 70000 && redLedPower > 0) {
+            --redLedPower;
+            changed = true;
+        }
+
+        if (changed) {
+            Serial.print("C:");
+            Serial.print((uint8_t)IR_LED_CURRENT);
+            Serial.print(",");
+            Serial.println(redLedPower);
+            hrm.setLedsCurrent(IR_LED_CURRENT, (LEDCurrent)redLedPower);
+            tsLastCurrentAdjustment = millis();
+        }
+
+        t3 = millis();
     }
 }
