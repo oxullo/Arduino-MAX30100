@@ -46,6 +46,9 @@ class  FilterBuLp1
 class DCRemover
 {
 public:
+	DCRemover() : alpha(0), dcw(0)
+	{
+	}
 	DCRemover(float alpha_) : alpha(alpha_), dcw(0)
 	{
 	}
