@@ -47,6 +47,7 @@ public:
     void update();
     float getHeartRate();
     uint8_t getSpO2();
+    void setOnBeatDetectedCallback(void (*cb)());
 
 private:
     void checkSample();
@@ -65,5 +66,7 @@ private:
     uint8_t redLedPower;
     SpO2Calculator spO2calculator;
     MAX30100 hrm;
+
+    void (*onBeatDetected)();
 };
 #endif

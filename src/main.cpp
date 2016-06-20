@@ -25,10 +25,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 PulseOximeter pox;
 uint32_t tsLastReport = 0;
 
+void onBeatDetected()
+{
+    Serial.println("B:1");
+}
+
 void setup()
 {
     Serial.begin(115200);
     pox.begin();
+    pox.setOnBeatDetectedCallback(onBeatDetected);
 }
 
 void loop()

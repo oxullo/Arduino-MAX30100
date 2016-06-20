@@ -28,7 +28,8 @@ PulseOximeter::PulseOximeter() :
     tsLastSample(0),
     tsLastBiasCheck(0),
     tsLastCurrentAdjustment(0),
-    redLedPower((uint8_t)RED_LED_CURRENT_START)
+    redLedPower((uint8_t)RED_LED_CURRENT_START),
+    onBeatDetected(NULL)
 {
 }
 
@@ -60,6 +61,11 @@ uint8_t PulseOximeter::getSpO2()
     return spO2calculator.getSpO2();
 }
 
+void PulseOximeter::setOnBeatDetectedCallback(void (*cb)())
+{
+    onBeatDetected = cb;
+}
+
 void PulseOximeter::checkSample()
 {
     if (millis() - tsLastSample > 1.0 / SAMPLING_FREQUENCY * 1000.0) {
@@ -83,8 +89,8 @@ void PulseOximeter::checkSample()
         // Serial.print(",");
         // Serial.println(redACValue);
 
-        if (beatDetected) {
-            Serial.println("B:1");
+        if (beatDetected && onBeatDetected) {
+            onBeatDetected();
         }
         tsLastSample = millis();
     }
