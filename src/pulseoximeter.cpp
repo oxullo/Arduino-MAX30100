@@ -61,6 +61,11 @@ uint8_t PulseOximeter::getSpO2()
     return spO2calculator.getSpO2();
 }
 
+uint8_t PulseOximeter::getRedLedCurrentBias()
+{
+    return redLedPower;
+}
+
 void PulseOximeter::setOnBeatDetectedCallback(void (*cb)())
 {
     onBeatDetected = cb;
@@ -111,10 +116,6 @@ void PulseOximeter::checkCurrentBias()
         }
 
         if (changed) {
-            Serial.print("C:");
-            Serial.print((uint8_t)IR_LED_CURRENT);
-            Serial.print(",");
-            Serial.println(redLedPower);
             hrm.setLedsCurrent(IR_LED_CURRENT, (LEDCurrent)redLedPower);
             tsLastCurrentAdjustment = millis();
         }

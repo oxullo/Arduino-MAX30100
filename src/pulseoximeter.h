@@ -47,6 +47,7 @@ public:
     void update();
     float getHeartRate();
     uint8_t getSpO2();
+    uint8_t getRedLedCurrentBias();
     void setOnBeatDetectedCallback(void (*cb)());
 
 private:
