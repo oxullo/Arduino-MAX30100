@@ -48,7 +48,6 @@ void loop()
         Serial.print("O:");
         Serial.println(pox.getSpO2());
 
-
         tsLastReport = millis();
     }
 }

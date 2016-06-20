@@ -89,11 +89,6 @@ void PulseOximeter::checkSample()
             spO2calculator.reset();
         }
 
-        // Serial.print("R:");
-        // Serial.print(irACValue);
-        // Serial.print(",");
-        // Serial.println(redACValue);
-
         if (beatDetected && onBeatDetected) {
             onBeatDetected();
         }
