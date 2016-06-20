@@ -38,12 +38,19 @@ typedef enum PulseOximeterState {
     PULSEOXIMETER_STATE_DETECTING
 } PulseOximeterState;
 
+typedef enum PulseOximeterDebuggingMode {
+    PULSEOXIMETER_DEBUGGINGMODE_NONE,
+    PULSEOXIMETER_DEBUGGINGMODE_RAW_VALUES,
+    PULSEOXIMETER_DEBUGGINGMODE_AC_VALUES,
+    PULSEOXIMETER_DEBUGGINGMODE_PULSEDETECT
+} PulseOximeterDebuggingMode;
+
 
 class PulseOximeter {
 public:
     PulseOximeter();
 
-    void begin();
+    void begin(PulseOximeterDebuggingMode debuggingMode_=PULSEOXIMETER_DEBUGGINGMODE_NONE);
     void update();
     float getHeartRate();
     uint8_t getSpO2();
@@ -55,6 +62,7 @@ private:
     void checkCurrentBias();
 
     PulseOximeterState state;
+    PulseOximeterDebuggingMode debuggingMode;
     uint32_t tsFirstBeatDetected;
     uint32_t tsLastBeatDetected;
     uint32_t tsLastSample;

@@ -5,7 +5,7 @@ final int HEIGHT = 600;
 final int CHANNELS = 2;
 final String serialPort = "/dev/tty.usbmodemFD13131";
 final color[] colors = {color(0, 0, 0), color(255, 0, 0), color(0, 255, 0), color(0, 0, 255)};
-final int ABSMAX = -1;
+final int ABSMAX = 800;
 
 float[][] series = new float[CHANNELS][WIDTH];
 float heartRate = 0;

@@ -33,8 +33,10 @@ PulseOximeter::PulseOximeter() :
 {
 }
 
-void PulseOximeter::begin()
+void PulseOximeter::begin(PulseOximeterDebuggingMode debuggingMode_)
 {
+    debuggingMode = debuggingMode_;
+
     hrm.begin();
     hrm.setMode(MAX30100_MODE_SPO2_HR);
     hrm.setLedsCurrent(IR_LED_CURRENT, RED_LED_CURRENT_START);
@@ -74,12 +76,14 @@ void PulseOximeter::setOnBeatDetectedCallback(void (*cb)())
 void PulseOximeter::checkSample()
 {
     if (millis() - tsLastSample > 1.0 / SAMPLING_FREQUENCY * 1000.0) {
+        tsLastSample = millis();
         hrm.update();
         float irACValue = irDCRemover.step(hrm.rawIRValue);
         float redACValue = redDCRemover.step(hrm.rawRedValue);
 
         // The signal fed to the beat detector is mirrored since the cleanest monotonic spike is below zero
-        bool beatDetected = beatDetector.addSample(lpf.step(-irACValue));
+        float filteredPulseValue = lpf.step(-irACValue);
+        bool beatDetected = beatDetector.addSample(filteredPulseValue);
 
         if (beatDetector.getRate() > 0) {
             state = PULSEOXIMETER_STATE_DETECTING;
@@ -89,10 +93,35 @@ void PulseOximeter::checkSample()
             spO2calculator.reset();
         }
 
+        switch (debuggingMode) {
+            case PULSEOXIMETER_DEBUGGINGMODE_RAW_VALUES:
+                Serial.print("R:");
+                Serial.print(hrm.rawIRValue);
+                Serial.print(",");
+                Serial.println(hrm.rawRedValue);
+                break;
+
+            case PULSEOXIMETER_DEBUGGINGMODE_AC_VALUES:
+                Serial.print("R:");
+                Serial.print(irACValue);
+                Serial.print(",");
+                Serial.println(redACValue);
+                break;
+
+            case PULSEOXIMETER_DEBUGGINGMODE_PULSEDETECT:
+                Serial.print("R:");
+                Serial.print(filteredPulseValue);
+                Serial.print(",");
+                Serial.println(beatDetector.getCurrentThreshold());
+                break;
+
+            default:
+                break;
+        }
+
         if (beatDetected && onBeatDetected) {
             onBeatDetected();
         }
-        tsLastSample = millis();
     }
 }
 
