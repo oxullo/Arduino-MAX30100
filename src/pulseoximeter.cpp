@@ -20,23 +20,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "pulseoximeter.h"
 
-// SaO2 Look-up Table
-// http://www.ti.com/lit/an/slaa274b/slaa274b.pdf
-const uint8_t PulseOximeter::spO2LUT[43] = {100,100,100,100,99,99,99,99,99,99,98,98,98,98,
-                                               98,97,97,97,97,97,97,96,96,96,96,96,96,95,95,
-                                               95,95,95,95,94,94,94,94,94,93,93,93,93,93};
-
 
 PulseOximeter::PulseOximeter() :
+    state(PULSEOXIMETER_STATE_INIT),
+    tsFirstBeatDetected(0),
+    tsLastBeatDetected(0),
     tsLastSample(0),
-    t3(0),
+    tsLastBiasCheck(0),
     tsLastCurrentAdjustment(0),
-    beatsDetectedNum(0),
-    samplesRecorded(0),
-    redLedPower((uint8_t)RED_LED_CURRENT_START),
-    irACValueSqSum(0),
-    redACValueSqSum(0),
-    spO2(0)
+    redLedPower((uint8_t)RED_LED_CURRENT_START)
 {
 }
 
@@ -48,6 +40,8 @@ void PulseOximeter::begin()
 
     irDCRemover = DCRemover(DC_REMOVER_ALPHA);
     redDCRemover = DCRemover(DC_REMOVER_ALPHA);
+
+    state = PULSEOXIMETER_STATE_IDLE;
 }
 
 void PulseOximeter::update()
@@ -63,7 +57,7 @@ float PulseOximeter::getHeartRate()
 
 uint8_t PulseOximeter::getSpO2()
 {
-    return spO2;
+    return spO2calculator.getSpO2();
 }
 
 void PulseOximeter::checkSample()
@@ -77,35 +71,17 @@ void PulseOximeter::checkSample()
         bool beatDetected = beatDetector.addSample(lpf.step(-irACValue));
 
         if (beatDetector.getRate() > 0) {
-            irACValueSqSum += irACValue * irACValue;
-            redACValueSqSum += redACValue * redACValue;
-            ++samplesRecorded;
-
-            if (beatDetected) {
-                ++beatsDetectedNum;
-                if (beatsDetectedNum == 3) {
-                    float acSqRatio = 100.0 * log(redACValueSqSum/samplesRecorded) / log(irACValueSqSum/samplesRecorded);
-                    uint8_t index = 0;
-
-                    if (acSqRatio > 66) {
-                        index = (uint8_t)acSqRatio - 66;
-                    } else if (acSqRatio > 50) {
-                        index = (uint8_t)acSqRatio - 50;
-                    }
-                    spO2 = spO2LUT[index];
-
-                    samplesRecorded = 0;
-                    redACValueSqSum = 0;
-                    irACValueSqSum = 0;
-                    beatsDetectedNum = 0;
-                }
-            }
+            state = PULSEOXIMETER_STATE_DETECTING;
+            spO2calculator.update(irACValue, redACValue, beatDetected);
+        } else if (state == PULSEOXIMETER_STATE_DETECTING) {
+            state = PULSEOXIMETER_STATE_IDLE;
+            spO2calculator.reset();
         }
 
-        Serial.print("R:");
-        Serial.print(irACValue);
-        Serial.print(",");
-        Serial.println(redACValue);
+        // Serial.print("R:");
+        // Serial.print(irACValue);
+        // Serial.print(",");
+        // Serial.println(redACValue);
 
         if (beatDetected) {
             Serial.println("B:1");
@@ -118,7 +94,7 @@ void PulseOximeter::checkCurrentBias()
 {
     // Follower that adjusts the red led current in order to have comparable DC baselines between
     // red and IR leds. The numbers are really magic: the less possible to avoid oscillations
-    if (millis() - t3 > CURRENT_ADJUSTMENT_PERIOD_MS) {
+    if (millis() - tsLastBiasCheck > CURRENT_ADJUSTMENT_PERIOD_MS) {
         bool changed = false;
         if (irDCRemover.getDCW() - redDCRemover.getDCW() > 70000 && redLedPower < MAX30100_LED_CURR_50MA) {
             ++redLedPower;
@@ -137,6 +113,6 @@ void PulseOximeter::checkCurrentBias()
             tsLastCurrentAdjustment = millis();
         }
 
-        t3 = millis();
+        tsLastBiasCheck = millis();
     }
 }

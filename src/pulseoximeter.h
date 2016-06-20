@@ -30,6 +30,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "max30100.h"
 #include "beatdetector.h"
 #include "filter.h"
+#include "spo2calculator.h"
+
+typedef enum PulseOximeterState {
+    PULSEOXIMETER_STATE_INIT,
+    PULSEOXIMETER_STATE_IDLE,
+    PULSEOXIMETER_STATE_DETECTING
+} PulseOximeterState;
 
 
 class PulseOximeter {
@@ -42,24 +49,21 @@ public:
     uint8_t getSpO2();
 
 private:
-    static const uint8_t spO2LUT[43];
-
     void checkSample();
     void checkCurrentBias();
 
+    PulseOximeterState state;
+    uint32_t tsFirstBeatDetected;
+    uint32_t tsLastBeatDetected;
     uint32_t tsLastSample;
-    uint32_t t3;
+    uint32_t tsLastBiasCheck;
     uint32_t tsLastCurrentAdjustment;
-    uint8_t beatsDetectedNum;
-    uint32_t samplesRecorded;
     BeatDetector beatDetector;
     DCRemover irDCRemover;
     DCRemover redDCRemover;
     FilterBuLp1 lpf;
     uint8_t redLedPower;
-    float irACValueSqSum;
-    float redACValueSqSum;
-    uint8_t spO2;
+    SpO2Calculator spO2calculator;
     MAX30100 hrm;
 };
 #endif
