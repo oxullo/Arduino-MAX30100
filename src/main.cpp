@@ -19,7 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <Arduino.h>
 
 #include "max30100.h"
-#include "pulsedetector.h"
+#include "beatdetector.h"
 #include "filter.h"
 
 #define SAMPLING_FREQUENCY                  100
@@ -52,7 +52,7 @@ void loop()
     static uint32_t tsLastCurrentAdjustment = 0;
     static uint8_t beatsDetectedNum = 0;
     static uint32_t samplesRecorded = 0;
-    static PulseDetector pulseDetector;
+    static BeatDetector beatDetector;
     static DCRemover irDCRemover(DC_REMOVER_ALPHA);
     static DCRemover redDCRemover(DC_REMOVER_ALPHA);
     static FilterBuLp1 lpf;
@@ -66,9 +66,9 @@ void loop()
         float redACValue = redDCRemover.step(hrm.rawRedValue);
 
         // The signal fed to the beat detector is mirrored since the cleanest monotonic spike is below zero
-        bool beatDetected = pulseDetector.addSample(lpf.step(-irACValue));
+        bool beatDetected = beatDetector.addSample(lpf.step(-irACValue));
 
-        if (pulseDetector.getHeartRate() > 0) {
+        if (beatDetector.getRate() > 0) {
             irACValueSqSum += irACValue * irACValue;
             redACValueSqSum += redACValue * redACValue;
             ++samplesRecorded;
@@ -108,7 +108,7 @@ void loop()
 
     if (millis() - t2 > HEARTRATE_REPORTING_PERIOD_MS) {
         Serial.print("H:");
-        Serial.println(pulseDetector.getHeartRate());
+        Serial.println(beatDetector.getRate());
 
         t2 = millis();
     }
