@@ -73,9 +73,15 @@ void PulseDetector::checkForBeat(float sample)
             break;
 
         case PULSEDETECTOR_STATE_FOLLOWING_SLOPE:
-            if (sample > threshold) {
-                threshold = min(sample, PULSEDETECTOR_MAX_THRESHOLD);
+            if (sample < threshold) {
+                state = PULSEDETECTOR_STATE_MAYBE_DETECTED;
             } else {
+                threshold = min(sample, PULSEDETECTOR_MAX_THRESHOLD);
+            }
+            break;
+
+        case PULSEDETECTOR_STATE_MAYBE_DETECTED:
+            if (sample + PULSEDETECTOR_STEP_RESILIENCY < threshold) {
                 // Found a beat
                 lastMaxValue = sample;
                 state = PULSEDETECTOR_STATE_MASKING;
@@ -86,6 +92,8 @@ void PulseDetector::checkForBeat(float sample)
                 }
 
                 tsLastPulse = millis();
+            } else {
+                state = PULSEDETECTOR_STATE_FOLLOWING_SLOPE;
             }
             break;
 

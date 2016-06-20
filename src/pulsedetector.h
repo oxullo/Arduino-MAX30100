@@ -23,9 +23,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #define PULSEDETECTOR_INIT_HOLDOFF                2000    // in ms, how long to wait before counting
 #define PULSEDETECTOR_MASKING_HOLDOFF             200     // in ms, non-retriggerable window after beat detection
-#define PULSEDETECTOR_BPFILTER_ALPHA              0.5     // EMA factor for the beat period value
-#define PULSEDETECTOR_MIN_THRESHOLD               30      // minimum threshold (filtered) value
-#define PULSEDETECTOR_MAX_THRESHOLD               500     // maximumg threshold (filtered) value
+#define PULSEDETECTOR_BPFILTER_ALPHA              0.6     // EMA factor for the beat period value
+#define PULSEDETECTOR_MIN_THRESHOLD               20      // minimum threshold (filtered) value
+#define PULSEDETECTOR_MAX_THRESHOLD               800     // maximum threshold (filtered) value
+#define PULSEDETECTOR_STEP_RESILIENCY             30      // maximum negative jump that triggers the pulse edge
 #define PULSEDETECTOR_THRESHOLD_FALLOFF_TARGET    0.3     // thr chasing factor of the max value when beat
 #define PULSEDETECTOR_THRESHOLD_DECAY_FACTOR      0.99    // thr chasing factor when no beat
 #define PULSEDETECTOR_INVALID_READOUT_DELAY       2000    // in ms, no-beat time to cause a reset
@@ -36,6 +37,7 @@ typedef enum PulseDetectorState {
     PULSEDETECTOR_STATE_INIT,
     PULSEDETECTOR_STATE_WAITING,
     PULSEDETECTOR_STATE_FOLLOWING_SLOPE,
+    PULSEDETECTOR_STATE_MAYBE_DETECTED,
     PULSEDETECTOR_STATE_MASKING
 } PulseDetectorState;
 
