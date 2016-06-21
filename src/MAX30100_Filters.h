@@ -16,8 +16,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef FILTER_H
-#define FILTER_H
+#ifndef MAX30100_FILTERS_H
+#define MAX30100_FILTERS_H
 
 // http://www.schwietering.com/jayduino/filtuino/
 // Low pass butterworth filter order=1 alpha1=0.1

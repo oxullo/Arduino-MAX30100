@@ -16,38 +16,29 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <Arduino.h>
+#ifndef MAX30100_SPO2CALCULATOR_H
+#define MAX30100_SPO2CALCULATOR_H
 
-#include "pulseoximeter.h"
+#include <stdint.h>
 
-#define REPORTING_PERIOD_MS     1000
+#define CALCULATE_EVERY_N_BEATS         3
 
-PulseOximeter pox;
-uint32_t tsLastReport = 0;
+class SpO2Calculator {
+public:
+    SpO2Calculator();
 
-void onBeatDetected()
-{
-    Serial.println("B:1");
-}
+    void update(float irACValue, float redACValue, bool beatDetected);
+    void reset();
+    uint8_t getSpO2();
 
-void setup()
-{
-    Serial.begin(115200);
-    pox.begin();
-    pox.setOnBeatDetectedCallback(onBeatDetected);
-}
+private:
+    static const uint8_t spO2LUT[43];
 
-void loop()
-{
-    pox.update();
+    float irACValueSqSum;
+    float redACValueSqSum;
+    uint8_t beatsDetectedNum;
+    uint32_t samplesRecorded;
+    uint8_t spO2;
+};
 
-    if (millis() - tsLastReport > REPORTING_PERIOD_MS) {
-        Serial.print("H:");
-        Serial.println(pox.getHeartRate());
-
-        Serial.print("O:");
-        Serial.println(pox.getSpO2());
-
-        tsLastReport = millis();
-    }
-}
+#endif

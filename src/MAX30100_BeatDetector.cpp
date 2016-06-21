@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <Arduino.h>
 
-#include "beatdetector.h"
+#include "MAX30100_BeatDetector.h"
 
 BeatDetector::BeatDetector() :
     state(BEATDETECTOR_STATE_INIT),

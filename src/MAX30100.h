@@ -21,7 +21,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <stdint.h>
 
-#include "max30100_regs.h"
+#include "MAX30100_Registers.h"
 
 #define DEFAULT_MODE                MAX30100_MODE_HRONLY
 #define DEFAULT_SAMPLING_RATE       MAX30100_SAMPRATE_100HZ

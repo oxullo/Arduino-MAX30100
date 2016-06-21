@@ -16,8 +16,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef PULSEOXIMETER_H
-#define PULSEOXIMETER_H
+#ifndef MAX30100_PULSEOXIMETER_H
+#define MAX30100_PULSEOXIMETER_H
 
 #define SAMPLING_FREQUENCY                  100
 #define CURRENT_ADJUSTMENT_PERIOD_MS        500
@@ -27,10 +27,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <stdint.h>
 
-#include "max30100.h"
-#include "beatdetector.h"
-#include "filter.h"
-#include "spo2calculator.h"
+#include "MAX30100.h"
+#include "MAX30100_BeatDetector.h"
+#include "MAX30100_Filters.h"
+#include "MAX30100_SpO2Calculator.h"
 
 typedef enum PulseOximeterState {
     PULSEOXIMETER_STATE_INIT,

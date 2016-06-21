@@ -16,8 +16,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef BEATDETECTOR_H
-#define BEATDETECTOR_H
+#ifndef MAX30100_BEATDETECTOR_H
+#define MAX30100_BEATDETECTOR_H
 
 #include <stdint.h>
 

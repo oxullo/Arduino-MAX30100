@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <Wire.h>
 
-#include "max30100.h"
+#include "MAX30100.h"
 
 MAX30100::MAX30100()
 {

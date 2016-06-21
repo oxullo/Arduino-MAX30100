@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <math.h>
 
-#include "spo2calculator.h"
+#include "MAX30100_SpO2Calculator.h"
 
 // SaO2 Look-up Table
 // http://www.ti.com/lit/an/slaa274b/slaa274b.pdf

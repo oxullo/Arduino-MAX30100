@@ -16,8 +16,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef MAX30100_REGS_H
-#define MAX30100_REGS_H
+#ifndef MAX30100_REGISTERS_H
+#define MAX30100_REGISTERS_H
 
 #define MAX30100_I2C_ADDRESS                    0x57
 
