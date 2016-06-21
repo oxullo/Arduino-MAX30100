@@ -16,6 +16,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+// This example must be used in conjunction with the Processing sketch located
+// in extras/rolling_graph
+
 #include "MAX30100_PulseOximeter.h"
 
 #define REPORTING_PERIOD_MS     1000
@@ -32,7 +35,7 @@ uint32_t tsLastReport = 0;
 // Callback (registered below) fired when a pulse is detected
 void onBeatDetected()
 {
-    Serial.println("Beat!");
+    Serial.println("B:1");
 }
 
 void setup()
@@ -40,7 +43,13 @@ void setup()
     Serial.begin(115200);
 
     // Initialize the PulseOximeter instance and register a beat-detected callback
-    pox.begin();
+    // The parameter passed to the begin() method changes the samples flow that
+    // the library spews to the serial.
+    // Options:
+    //  * PULSEOXIMETER_DEBUGGINGMODE_PULSEDETECT : filtered samples and beat detection threshold
+    //  * PULSEOXIMETER_DEBUGGINGMODE_RAW_VALUES : sampled values coming from the sensor, with no processing
+    //  * PULSEOXIMETER_DEBUGGINGMODE_AC_VALUES : sampled values after the DC removal filter
+    pox.begin(PULSEOXIMETER_DEBUGGINGMODE_PULSEDETECT);
     pox.setOnBeatDetectedCallback(onBeatDetected);
 }
 
@@ -52,11 +61,11 @@ void loop()
     // Asynchronously dump heart rate and oxidation levels to the serial
     // For both, a value of 0 means "invalid"
     if (millis() - tsLastReport > REPORTING_PERIOD_MS) {
-        Serial.print("Heart rate:");
-        Serial.print(pox.getHeartRate());
-        Serial.print("bpm / SpO2:");
-        Serial.print(pox.getSpO2());
-        Serial.println("%");
+        Serial.print("H:");
+        Serial.println(pox.getHeartRate());
+
+        Serial.print("O:");
+        Serial.println(pox.getSpO2());
 
         tsLastReport = millis();
     }

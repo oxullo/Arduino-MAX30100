@@ -1,11 +1,37 @@
+/*
+Arduino-MAX30100 oximetry / heart rate integrated sensor library
+Copyright (C) 2016  OXullo Intersecans <x@brainrapers.org>
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+// Grapher helper for the Arduino MAX30100 library
+
 import processing.serial.*;
+
+// NOTE: when using PULSEOXIMETER_DEBUGGINGMODE_RAW_VALUES
+// set this to -1 to enable the auto range mode
+final int ABSMAX = 800;
+// Adjust to the serial port. Under OSX, UNO platforms and alike are auto-detected.
+final String serialPort = "/dev/tty.usbmodemFD13131";
+
 
 final int WIDTH = 1200;
 final int HEIGHT = 600;
 final int CHANNELS = 2;
-final String serialPort = "/dev/tty.usbmodemFD13131";
 final color[] colors = {color(0, 0, 0), color(255, 0, 0), color(0, 255, 0), color(0, 0, 255)};
-final int ABSMAX = 800;
+
 
 float[][] series = new float[CHANNELS][WIDTH];
 float heartRate = 0;
