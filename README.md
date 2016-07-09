@@ -15,7 +15,7 @@ along with an Arduino UNO r3. Any Arduino supporting the Wire library should wor
 The only required connection to the sensor is the I2C bus (SDA, SCL lines, pulled up).
 
 An example which shows a possible way to wire up the sensor is shown in
-[extras/arduino-wiring.pdf](blob/master/extras/arduino-wiring.pdf)
+[extras/arduino-wiring.pdf](extras/arduino-wiring.pdf)
 
 Note: The schematics above shows also how to wire up the interrupt line, which is
 currently not used by the library.
