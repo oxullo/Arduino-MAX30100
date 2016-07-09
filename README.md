@@ -1,6 +1,8 @@
 # Arduino-MAX30100
 
-Arduino library for the Maxim MAX30100 oximetry / heart rate integrated sensor.
+Arduino library for the Maxim Integrated MAX30100 oximetry / heart rate sensor.
+
+![MAX30100](http://www.mouser.com/images/microsites/Maxim_MAX30100.jpg)
 
 ## Hardware
 
@@ -8,8 +10,15 @@ This library has been tested with the MikroElektronika Heart rate click daughter
 
 http://www.mikroe.com/click/heart-rate/
 
-The only requirement for the library to work is to have the sensor wired to the
-host microcontroller's I2C bus.
+along with an Arduino UNO r3. Any Arduino supporting the Wire library should work.
+
+The only required connection to the sensor is the I2C bus (SDA, SCL lines, pulled up).
+
+An example which shows a possible way to wire up the sensor is shown in
+[extras/arduino-wiring.pdf](blob/master/extras/arduino-wiring.pdf)
+
+Note: The schematics above shows also how to wire up the interrupt line, which is
+currently not used by the library.
 
 ## Architecture
 
