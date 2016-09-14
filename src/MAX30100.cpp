@@ -26,8 +26,7 @@ MAX30100::MAX30100()
 
 void MAX30100::begin()
 {
-    Wire.begin();
-    Wire.setClock(I2C_BUS_SPEED);
+    Wire.begin(TWI_SCL, TWI_SDA, I2C_BUS_SPEED);
 
     setMode(DEFAULT_MODE);
     setLedsPulseWidth(DEFAULT_PULSE_WIDTH);
