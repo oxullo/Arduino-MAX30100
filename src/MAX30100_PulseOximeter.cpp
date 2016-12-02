@@ -28,7 +28,9 @@ PulseOximeter::PulseOximeter() :
     tsLastSample(0),
     tsLastBiasCheck(0),
     tsLastCurrentAdjustment(0),
+    tsLastTemperaturePoll(0),
     redLedPower((uint8_t)RED_LED_CURRENT_START),
+    temperature(0),
     onBeatDetected(NULL)
 {
 }
@@ -45,12 +47,18 @@ void PulseOximeter::begin(PulseOximeterDebuggingMode debuggingMode_)
     redDCRemover = DCRemover(DC_REMOVER_ALPHA);
 
     state = PULSEOXIMETER_STATE_IDLE;
+
+    // Start temperature sampling and wait for its completion (blocking)
+    hrm.startTemperatureSampling();
+    while (!hrm.isTemperatureReady());
+    temperature = hrm.retrieveTemperature();
 }
 
 void PulseOximeter::update()
 {
     checkSample();
     checkCurrentBias();
+    checkTemperature();
 }
 
 float PulseOximeter::getHeartRate()
@@ -66,6 +74,11 @@ uint8_t PulseOximeter::getSpO2()
 uint8_t PulseOximeter::getRedLedCurrentBias()
 {
     return redLedPower;
+}
+
+float PulseOximeter::getTemperature()
+{
+    return temperature;
 }
 
 void PulseOximeter::setOnBeatDetectedCallback(void (*cb)())
@@ -145,5 +158,17 @@ void PulseOximeter::checkCurrentBias()
         }
 
         tsLastBiasCheck = millis();
+    }
+}
+
+void PulseOximeter::checkTemperature()
+{
+    if (millis() - tsLastTemperaturePoll > TEMPERATURE_SAMPLING_PERIOD_MS) {
+        if (hrm.isTemperatureReady()) {
+            temperature = hrm.retrieveTemperature();
+        }
+        hrm.startTemperatureSampling();
+
+        tsLastTemperaturePoll = millis();
     }
 }

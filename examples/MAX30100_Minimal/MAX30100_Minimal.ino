@@ -40,6 +40,7 @@ void setup()
 {
     Serial.begin(115200);
 
+    Serial.println("Initializing MAX30100");
     // Initialize the PulseOximeter instance and register a beat-detected callback
     pox.begin();
     pox.setOnBeatDetectedCallback(onBeatDetected);
@@ -57,7 +58,9 @@ void loop()
         Serial.print(pox.getHeartRate());
         Serial.print("bpm / SpO2:");
         Serial.print(pox.getSpO2());
-        Serial.println("%");
+        Serial.print("% / temp:");
+        Serial.print(pox.getTemperature());
+        Serial.println("C");
 
         tsLastReport = millis();
     }

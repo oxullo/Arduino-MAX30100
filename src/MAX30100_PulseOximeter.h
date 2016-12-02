@@ -24,6 +24,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define IR_LED_CURRENT                      MAX30100_LED_CURR_50MA
 #define RED_LED_CURRENT_START               MAX30100_LED_CURR_27_1MA
 #define DC_REMOVER_ALPHA                    0.95
+#define TEMPERATURE_SAMPLING_PERIOD_MS      2000
 
 #include <stdint.h>
 
@@ -55,11 +56,13 @@ public:
     float getHeartRate();
     uint8_t getSpO2();
     uint8_t getRedLedCurrentBias();
+    float getTemperature();
     void setOnBeatDetectedCallback(void (*cb)());
 
 private:
     void checkSample();
     void checkCurrentBias();
+    void checkTemperature();
 
     PulseOximeterState state;
     PulseOximeterDebuggingMode debuggingMode;
@@ -68,11 +71,13 @@ private:
     uint32_t tsLastSample;
     uint32_t tsLastBiasCheck;
     uint32_t tsLastCurrentAdjustment;
+    uint32_t tsLastTemperaturePoll;
     BeatDetector beatDetector;
     DCRemover irDCRemover;
     DCRemover redDCRemover;
     FilterBuLp1 lpf;
     uint8_t redLedPower;
+    float temperature;
     SpO2Calculator spO2calculator;
     MAX30100 hrm;
 

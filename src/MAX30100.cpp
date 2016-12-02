@@ -114,3 +114,24 @@ void MAX30100::readFifoData()
     rawIRValue = (buffer[0] << 8) | buffer[1];
     rawRedValue = (buffer[2] << 8) | buffer[3];
 }
+
+void MAX30100::startTemperatureSampling()
+{
+    uint8_t modeConfig = readRegister(MAX30100_REG_MODE_CONFIGURATION);
+    modeConfig |= MAX30100_MC_TEMP_EN;
+
+    writeRegister(MAX30100_REG_MODE_CONFIGURATION, modeConfig);
+}
+
+bool MAX30100::isTemperatureReady()
+{
+    return !(readRegister(MAX30100_REG_MODE_CONFIGURATION) & MAX30100_MC_TEMP_EN);
+}
+
+float MAX30100::retrieveTemperature()
+{
+    int8_t tempInteger = readRegister(MAX30100_REG_TEMPERATURE_DATA_INT);
+    float tempFrac = readRegister(MAX30100_REG_TEMPERATURE_DATA_FRAC);
+
+    return tempFrac * 0.0625 + tempInteger;
+}

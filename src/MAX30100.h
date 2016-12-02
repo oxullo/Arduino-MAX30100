@@ -41,6 +41,9 @@ public:
     void setLedsCurrent(LEDCurrent irLedCurrent, LEDCurrent redLedCurrent);
     void setHighresModeEnabled(bool enabled);
     void update();
+    void startTemperatureSampling();
+    bool isTemperatureReady();
+    float retrieveTemperature();
 
     uint16_t rawIRValue;
     uint16_t rawRedValue;
