@@ -61,7 +61,7 @@ void loop()
 {
     // Using this construct instead of a delay allows to account for the time
     // spent sending data thru the serial and tighten the timings with the sampling
-    if (micros() - tsLastPollUs > POLL_PERIOD_US) {
+    if (micros() < tsLastPollUs || micros() - tsLastPollUs > POLL_PERIOD_US) {
         sensor.update();
         tsLastPollUs = micros();
 
