@@ -46,4 +46,4 @@ The included examples show how to use the PulseOximeter class:
 
  * MAX30100_Minimal: a minimal example that dumps human-readable results via serial
  * MAX30100_Debug: used in conjunction with the Processing pde "rolling_graph" (extras folder), to show the sampled data at various processing stages
-
+ * MAX_30100_RawData: demonstrates how to access raw data from the sensor
