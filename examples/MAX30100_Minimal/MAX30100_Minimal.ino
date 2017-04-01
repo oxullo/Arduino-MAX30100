@@ -41,8 +41,16 @@ void setup()
     Serial.begin(115200);
 
     Serial.println("Initializing MAX30100");
-    // Initialize the PulseOximeter instance and register a beat-detected callback
+
+    // Initialize the PulseOximeter instance
     pox.begin();
+
+    // The default current for the IR LED is 50mA and it could be changed
+    //   by uncommenting the following line. Check MAX30100_Registers.h for all the
+    //   available options.
+    // pox.setIRLedCurrent(MAX30100_LED_CURR_30_6MA);
+
+    // Register a callback for the beat detection
     pox.setOnBeatDetectedCallback(onBeatDetected);
 }
 

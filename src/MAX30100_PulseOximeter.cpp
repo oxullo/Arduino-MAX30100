@@ -86,6 +86,11 @@ void PulseOximeter::setOnBeatDetectedCallback(void (*cb)())
     onBeatDetected = cb;
 }
 
+void PulseOximeter::setIRLedCurrent(LEDCurrent irLedCurrent)
+{
+    hrm.setLedsCurrent(irLedCurrent, (LEDCurrent)redLedPower);
+}
+
 void PulseOximeter::checkSample()
 {
     if (millis() - tsLastSample > 1.0 / SAMPLING_FREQUENCY * 1000.0) {

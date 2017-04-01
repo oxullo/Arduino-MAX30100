@@ -58,6 +58,7 @@ public:
     uint8_t getRedLedCurrentBias();
     float getTemperature();
     void setOnBeatDetectedCallback(void (*cb)());
+    void setIRLedCurrent(LEDCurrent irLedCurrent);
 
 private:
     void checkSample();
