@@ -95,8 +95,8 @@ void PulseOximeter::setIRLedCurrent(LEDCurrent irLedNewCurrent)
 
 void PulseOximeter::checkSample()
 {
-    if (millis() - tsLastSample > 1.0 / SAMPLING_FREQUENCY * 1000.0) {
-        tsLastSample = millis();
+    if (micros() < tsLastSample || micros() - tsLastSample >= 1.0 / SAMPLING_FREQUENCY * 1000000.0) {
+        tsLastSample = micros();
         hrm.update();
         float irACValue = irDCRemover.step(hrm.rawIRValue);
         float redACValue = redDCRemover.step(hrm.rawRedValue);
