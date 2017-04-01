@@ -30,6 +30,7 @@ PulseOximeter::PulseOximeter() :
     tsLastCurrentAdjustment(0),
     tsLastTemperaturePoll(0),
     redLedPower((uint8_t)RED_LED_CURRENT_START),
+    irLedCurrent(DEFAULT_IR_LED_CURRENT),
     temperature(0),
     onBeatDetected(NULL)
 {
@@ -41,7 +42,7 @@ void PulseOximeter::begin(PulseOximeterDebuggingMode debuggingMode_)
 
     hrm.begin();
     hrm.setMode(MAX30100_MODE_SPO2_HR);
-    hrm.setLedsCurrent(IR_LED_CURRENT, RED_LED_CURRENT_START);
+    hrm.setLedsCurrent(irLedCurrent, (LEDCurrent)redLedPower);
 
     irDCRemover = DCRemover(DC_REMOVER_ALPHA);
     redDCRemover = DCRemover(DC_REMOVER_ALPHA);
@@ -86,8 +87,9 @@ void PulseOximeter::setOnBeatDetectedCallback(void (*cb)())
     onBeatDetected = cb;
 }
 
-void PulseOximeter::setIRLedCurrent(LEDCurrent irLedCurrent)
+void PulseOximeter::setIRLedCurrent(LEDCurrent irLedNewCurrent)
 {
+    irLedCurrent = irLedNewCurrent;
     hrm.setLedsCurrent(irLedCurrent, (LEDCurrent)redLedPower);
 }
 
@@ -158,7 +160,7 @@ void PulseOximeter::checkCurrentBias()
         }
 
         if (changed) {
-            hrm.setLedsCurrent(IR_LED_CURRENT, (LEDCurrent)redLedPower);
+            hrm.setLedsCurrent(irLedCurrent, (LEDCurrent)redLedPower);
             tsLastCurrentAdjustment = millis();
         }
 

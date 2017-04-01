@@ -48,7 +48,7 @@ void setup()
     // The default current for the IR LED is 50mA and it could be changed
     //   by uncommenting the following line. Check MAX30100_Registers.h for all the
     //   available options.
-    // pox.setIRLedCurrent(MAX30100_LED_CURR_30_6MA);
+    // pox.setIRLedCurrent(MAX30100_LED_CURR_7_6MA);
 
     // Register a callback for the beat detection
     pox.setOnBeatDetectedCallback(onBeatDetected);

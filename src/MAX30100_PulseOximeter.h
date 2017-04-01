@@ -21,7 +21,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #define SAMPLING_FREQUENCY                  100
 #define CURRENT_ADJUSTMENT_PERIOD_MS        500
-#define IR_LED_CURRENT                      MAX30100_LED_CURR_50MA
+#define DEFAULT_IR_LED_CURRENT              MAX30100_LED_CURR_50MA
 #define RED_LED_CURRENT_START               MAX30100_LED_CURR_27_1MA
 #define DC_REMOVER_ALPHA                    0.95
 #define TEMPERATURE_SAMPLING_PERIOD_MS      2000
@@ -78,6 +78,7 @@ private:
     DCRemover redDCRemover;
     FilterBuLp1 lpf;
     uint8_t redLedPower;
+    LEDCurrent irLedCurrent;
     float temperature;
     SpO2Calculator spO2calculator;
     MAX30100 hrm;
