@@ -22,6 +22,11 @@ An example which shows a possible way to wire up the sensor is shown in
 Note: The schematics above shows also how to wire up the interrupt line, which is
 currently not used by the library.
 
+### Pull-ups
+
+Since the I2C interface is clocked at 400kHz, make sure that the SDA/SCL lines are pulled
+up by 4,7kOhm or less resistors.
+
 ## Architecture
 
 The library offers a low-level driver class, MAX30100.
@@ -47,3 +52,19 @@ The included examples show how to use the PulseOximeter class:
  * MAX30100_Minimal: a minimal example that dumps human-readable results via serial
  * MAX30100_Debug: used in conjunction with the Processing pde "rolling_graph" (extras folder), to show the sampled data at various processing stages
  * MAX_30100_RawData: demonstrates how to access raw data from the sensor
+
+## Troubleshooting
+
+Typical issues when attempting to run the examples:
+
+### The module fails to initialize, getting stuck at the begin()
+
+This is likely to be caused by an improper pullup setup for the I2C lines.
+Make sure to use 4,7kOhm resistors, checking if the breakout board in use is equipped
+with pullups.
+
+### Sketchy beat frequency readouts
+
+The beat detector uses the IR LED to track the heartbeat. The IR LED is biased
+by default at 50mA but it can be adjusted using PulseOximeter::setIRLedCurrent().
+Check the _MAX30100_Minimal_ example.
