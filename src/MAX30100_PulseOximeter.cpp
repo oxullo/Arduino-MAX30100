@@ -29,7 +29,7 @@ PulseOximeter::PulseOximeter() :
     tsLastBiasCheck(0),
     tsLastCurrentAdjustment(0),
     tsLastTemperaturePoll(0),
-    redLedPower((uint8_t)RED_LED_CURRENT_START),
+    redLedCurrentIndex((uint8_t)RED_LED_CURRENT_START),
     irLedCurrent(DEFAULT_IR_LED_CURRENT),
     temperature(0),
     onBeatDetected(NULL)
@@ -42,7 +42,7 @@ void PulseOximeter::begin(PulseOximeterDebuggingMode debuggingMode_)
 
     hrm.begin();
     hrm.setMode(MAX30100_MODE_SPO2_HR);
-    hrm.setLedsCurrent(irLedCurrent, (LEDCurrent)redLedPower);
+    hrm.setLedsCurrent(irLedCurrent, (LEDCurrent)redLedCurrentIndex);
 
     irDCRemover = DCRemover(DC_REMOVER_ALPHA);
     redDCRemover = DCRemover(DC_REMOVER_ALPHA);
@@ -74,7 +74,7 @@ uint8_t PulseOximeter::getSpO2()
 
 uint8_t PulseOximeter::getRedLedCurrentBias()
 {
-    return redLedPower;
+    return redLedCurrentIndex;
 }
 
 float PulseOximeter::getTemperature()
@@ -90,7 +90,7 @@ void PulseOximeter::setOnBeatDetectedCallback(void (*cb)())
 void PulseOximeter::setIRLedCurrent(LEDCurrent irLedNewCurrent)
 {
     irLedCurrent = irLedNewCurrent;
-    hrm.setLedsCurrent(irLedCurrent, (LEDCurrent)redLedPower);
+    hrm.setLedsCurrent(irLedCurrent, (LEDCurrent)redLedCurrentIndex);
 }
 
 void PulseOximeter::checkSample()
@@ -151,16 +151,16 @@ void PulseOximeter::checkCurrentBias()
     // red and IR leds. The numbers are really magic: the less possible to avoid oscillations
     if (millis() - tsLastBiasCheck > CURRENT_ADJUSTMENT_PERIOD_MS) {
         bool changed = false;
-        if (irDCRemover.getDCW() - redDCRemover.getDCW() > 70000 && redLedPower < MAX30100_LED_CURR_50MA) {
-            ++redLedPower;
+        if (irDCRemover.getDCW() - redDCRemover.getDCW() > 70000 && redLedCurrentIndex < MAX30100_LED_CURR_50MA) {
+            ++redLedCurrentIndex;
             changed = true;
-        } else if (redDCRemover.getDCW() - irDCRemover.getDCW() > 70000 && redLedPower > 0) {
-            --redLedPower;
+        } else if (redDCRemover.getDCW() - irDCRemover.getDCW() > 70000 && redLedCurrentIndex > 0) {
+            --redLedCurrentIndex;
             changed = true;
         }
 
         if (changed) {
-            hrm.setLedsCurrent(irLedCurrent, (LEDCurrent)redLedPower);
+            hrm.setLedsCurrent(irLedCurrent, (LEDCurrent)redLedCurrentIndex);
             tsLastCurrentAdjustment = millis();
         }
 

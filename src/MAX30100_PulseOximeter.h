@@ -77,7 +77,7 @@ private:
     DCRemover irDCRemover;
     DCRemover redDCRemover;
     FilterBuLp1 lpf;
-    uint8_t redLedPower;
+    uint8_t redLedCurrentIndex;
     LEDCurrent irLedCurrent;
     float temperature;
     SpO2Calculator spO2calculator;
