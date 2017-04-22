@@ -50,7 +50,15 @@ void setup()
     //  * PULSEOXIMETER_DEBUGGINGMODE_PULSEDETECT : filtered samples and beat detection threshold
     //  * PULSEOXIMETER_DEBUGGINGMODE_RAW_VALUES : sampled values coming from the sensor, with no processing
     //  * PULSEOXIMETER_DEBUGGINGMODE_AC_VALUES : sampled values after the DC removal filter
-    pox.begin(PULSEOXIMETER_DEBUGGINGMODE_PULSEDETECT);
+
+    // Initialize the PulseOximeter instance
+    // Failures are generally due to an improper I2C wiring, missing power supply
+    // or wrong target chip
+    if (!pox.begin(PULSEOXIMETER_DEBUGGINGMODE_PULSEDETECT)) {
+        Serial.println("ERROR: Failed to initialize pulse oximeter");
+        for(;;);
+    }
+
     pox.setOnBeatDetectedCallback(onBeatDetected);
 }
 

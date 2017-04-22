@@ -28,13 +28,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define DEFAULT_PULSE_WIDTH         MAX30100_SPC_PW_1600US_16BITS
 #define DEFAULT_RED_LED_CURRENT     MAX30100_LED_CURR_50MA
 #define DEFAULT_IR_LED_CURRENT      MAX30100_LED_CURR_50MA
+#define EXPECTED_PART_ID            0x11
 
 #define I2C_BUS_SPEED               400000UL
 
 class MAX30100 {
 public:
     MAX30100();
-    void begin();
+    bool begin();
     void setMode(Mode mode);
     void setLedsPulseWidth(LEDPulseWidth ledPulseWidth);
     void setSamplingRate(SamplingRate samplingRate);
@@ -46,6 +47,7 @@ public:
     float retrieveTemperature();
     void shutdown();
     void resume();
+    uint8_t getPartId();
 
     uint16_t rawIRValue;
     uint16_t rawRedValue;

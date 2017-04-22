@@ -48,8 +48,19 @@ void setup()
 {
     Serial.begin(115200);
 
+    Serial.print("Initializing MAX30100..");
+
+    // Initialize the sensor
+    // Failures are generally due to an improper I2C wiring, missing power supply
+    // or wrong target chip
+    if (!sensor.begin()) {
+        Serial.println("FAILED");
+        for(;;);
+    } else {
+        Serial.println("SUCCESS");
+    }
+
     // Set up the wanted parameters
-    sensor.begin();
     sensor.setMode(MAX30100_MODE_SPO2_HR);
     sensor.setLedsCurrent(IR_LED_CURRENT, RED_LED_CURRENT);
     sensor.setLedsPulseWidth(PULSE_WIDTH);

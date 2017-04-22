@@ -36,11 +36,19 @@ PulseOximeter::PulseOximeter() :
 {
 }
 
-void PulseOximeter::begin(PulseOximeterDebuggingMode debuggingMode_)
+bool PulseOximeter::begin(PulseOximeterDebuggingMode debuggingMode_)
 {
     debuggingMode = debuggingMode_;
 
-    hrm.begin();
+    bool ready = hrm.begin();
+
+    if (!ready) {
+        if (debuggingMode != PULSEOXIMETER_DEBUGGINGMODE_NONE) {
+            Serial.println("Failed to initialize the HRM sensor");
+        }
+        return false;
+    }
+
     hrm.setMode(MAX30100_MODE_SPO2_HR);
     hrm.setLedsCurrent(irLedCurrent, (LEDCurrent)redLedCurrentIndex);
 
@@ -53,6 +61,8 @@ void PulseOximeter::begin(PulseOximeterDebuggingMode debuggingMode_)
     hrm.startTemperatureSampling();
     while (!hrm.isTemperatureReady());
     temperature = hrm.retrieveTemperature();
+
+    return true;
 }
 
 void PulseOximeter::update()

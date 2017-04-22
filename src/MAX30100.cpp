@@ -24,16 +24,22 @@ MAX30100::MAX30100()
 {
 }
 
-void MAX30100::begin()
+bool MAX30100::begin()
 {
     Wire.begin();
     Wire.setClock(I2C_BUS_SPEED);
+
+    if (getPartId() != EXPECTED_PART_ID) {
+        return false;
+    }
 
     setMode(DEFAULT_MODE);
     setLedsPulseWidth(DEFAULT_PULSE_WIDTH);
     setSamplingRate(DEFAULT_SAMPLING_RATE);
     setLedsCurrent(DEFAULT_IR_LED_CURRENT, DEFAULT_RED_LED_CURRENT);
     setHighresModeEnabled(true);
+
+    return true;
 }
 
 void MAX30100::setMode(Mode mode)
@@ -150,4 +156,9 @@ void MAX30100::resume()
     modeConfig &= ~MAX30100_MC_SHDN;
 
     writeRegister(MAX30100_REG_MODE_CONFIGURATION, modeConfig);
+}
+
+uint8_t MAX30100::getPartId()
+{
+    return readRegister(0xff);
 }

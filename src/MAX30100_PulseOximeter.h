@@ -51,7 +51,7 @@ class PulseOximeter {
 public:
     PulseOximeter();
 
-    void begin(PulseOximeterDebuggingMode debuggingMode_=PULSEOXIMETER_DEBUGGINGMODE_NONE);
+    bool begin(PulseOximeterDebuggingMode debuggingMode_=PULSEOXIMETER_DEBUGGINGMODE_NONE);
     void update();
     float getHeartRate();
     uint8_t getSpO2();
