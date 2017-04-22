@@ -59,6 +59,8 @@ public:
     float getTemperature();
     void setOnBeatDetectedCallback(void (*cb)());
     void setIRLedCurrent(LEDCurrent irLedCurrent);
+    void shutdown();
+    void resume();
 
 private:
     void checkSample();

@@ -44,6 +44,8 @@ public:
     void startTemperatureSampling();
     bool isTemperatureReady();
     float retrieveTemperature();
+    void shutdown();
+    void resume();
 
     uint16_t rawIRValue;
     uint16_t rawRedValue;

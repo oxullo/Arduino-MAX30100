@@ -135,3 +135,19 @@ float MAX30100::retrieveTemperature()
 
     return tempFrac * 0.0625 + tempInteger;
 }
+
+void MAX30100::shutdown()
+{
+    uint8_t modeConfig = readRegister(MAX30100_REG_MODE_CONFIGURATION);
+    modeConfig |= MAX30100_MC_SHDN;
+
+    writeRegister(MAX30100_REG_MODE_CONFIGURATION, modeConfig);
+}
+
+void MAX30100::resume()
+{
+    uint8_t modeConfig = readRegister(MAX30100_REG_MODE_CONFIGURATION);
+    modeConfig &= ~MAX30100_MC_SHDN;
+
+    writeRegister(MAX30100_REG_MODE_CONFIGURATION, modeConfig);
+}

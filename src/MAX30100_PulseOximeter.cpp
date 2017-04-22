@@ -93,6 +93,16 @@ void PulseOximeter::setIRLedCurrent(LEDCurrent irLedNewCurrent)
     hrm.setLedsCurrent(irLedCurrent, (LEDCurrent)redLedCurrentIndex);
 }
 
+void PulseOximeter::shutdown()
+{
+    hrm.shutdown();
+}
+
+void PulseOximeter::resume()
+{
+    hrm.resume();
+}
+
 void PulseOximeter::checkSample()
 {
     if (micros() < tsLastSample || micros() - tsLastSample >= 1.0 / SAMPLING_FREQUENCY * 1000000.0) {
