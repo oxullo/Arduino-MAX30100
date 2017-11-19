@@ -21,7 +21,7 @@ logger = logging.getLogger(__name__)
 
 class SerialStreamer(threading.Thread):
     DEFAULT_SPEED = 115200
-    DEFAULT_HOLDOFF = 1.5
+    DEFAULT_HOLDOFF = 3
     DEFAULT_TIMEOUT = .1
 
     def __init__(self, port, holdoff=DEFAULT_HOLDOFF, speed=DEFAULT_SPEED):
@@ -32,12 +32,15 @@ class SerialStreamer(threading.Thread):
         self._time_started = 0
 
     def run(self):
-        logger.info('Starting streamer thread')
+        logger.info('Starting streamer thread, delaying acquisition by %.2fs' % self._holdoff)
         self._isRunning = True
 
-        time.sleep(self._holdoff)
-        self._s.flushInput()
+        tstarted = time.time()
 
+        while time.time() - tstarted < self._holdoff and self._isRunning:
+            self._s.readline()
+
+        logger.info('Started acquisition')
         self._time_started = time.time()
 
         while self._isRunning:
@@ -78,8 +81,9 @@ def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('port', help='Serial port of the device')
     parser.add_argument('outfile', help='Output recording file')
-    parser.add_argument('--holdoff', type=float, default=1.5,
-                        help='Settlement time after connection')
+    parser.add_argument('--holdoff', type=float, default=SerialStreamer.DEFAULT_HOLDOFF,
+                        help='Seconds to wait after connection before starting '
+                             'acquisition')
     parser.add_argument('--debug', action='store_true', help='Be verbose')
     parser.add_argument('--samples', type=int, default=0,
                         help='Define the number of samples to be fetched, 0 to infinite')
@@ -95,7 +99,7 @@ def gather(streamer, fp, maxsamples):
 
         for sample in samples:
             fp.write('%d\t%d\t%d\n' % sample)
-        logger.info('Gathered %d samples' % samples_count)
+        logger.info('Gathered %d/%d/%d samples' % (len(samples), samples_count, maxsamples))
 
         if samples_count > maxsamples:
             logging.info('Acquired %d samples (requested: %d), stopping' %
@@ -104,28 +108,34 @@ def gather(streamer, fp, maxsamples):
 
         time.sleep(1)
 
-def run():
-    args = parse_args()
+def run(port, outfile, holdoff, debug, samples):
 
-    if args.debug:
+    if debug:
         level = logging.DEBUG
     else:
         level = logging.INFO
 
     logging.basicConfig(level=level)
 
-    streamer = SerialStreamer(args.port, args.holdoff)
+    streamer = SerialStreamer(port, holdoff)
     streamer.start()
 
-    fp = open(args.outfile, 'w')
+    fp = open(outfile, 'w')
+
+    fp.write('timestamp\tir_level\tred_level\n')
 
     try:
-        gather(streamer, fp, args.samples)
+        gather(streamer, fp, samples)
     except KeyboardInterrupt:
         logger.info('Terminating')
     finally:
         fp.close()
         streamer.stop()
 
+def cli_run():
+    args = parse_args()
+
+    run(args.port, args.outfile, args.holdoff, args.debug, args.samples)
+
 if __name__ == '__main__':
-    run()
+    cli_run()
