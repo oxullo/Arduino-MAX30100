@@ -90,6 +90,16 @@ This is likely to be caused by an improper pullup setup for the I2C lines.
 Make sure to use 4,7kOhm resistors, checking if the breakout board in use is equipped
 with pullups.
 
+### Logic level compatibility
+
+If you're using a 5V-based microcontroller but the sensor breakout board pulls SDA and SCL up
+to 3.3V, you should ensure that its inputs are compatible with the 3.3V logic levels.
+An original Atmel ATMega328p considers anything above 3V as HIGH, so it might work well without
+level shifting hardware.
+
+Since the MAX30100 I2C pins maximum ratings aren't bound to Vdd, a cheap option to avoid
+level shifting is to simply pull SDA and SCL up to 5V instead of 3.3V.
+
 ### Sketchy beat frequency readouts
 
 The beat detector uses the IR LED to track the heartbeat. The IR LED is biased
@@ -98,3 +108,27 @@ This value is somehow critical and it must be experimented with.
 
 The current can be adjusted using PulseOximeter::setIRLedCurrent().
 Check the _MAX30100_Minimal_ example.
+
+### Advanced debugging
+
+Two tools are available for further inspection and error reporting:
+
+* extras/recorder: a python script that records a session that can be then analysed with the provided collection of jupyter notebooks
+* extras/rolling_graph: to be used in conjunction with _MAX30100_Debug_ example, it provides a visual feedback of the LED tracking and heartbeat detector
+
+Both tools have additional information on the README.md in their respective directories.
+
+## Tested devices
+
+* Arduino UNO r3, Mikroelektronika Heart rate click (https://shop.mikroe.com/heart-rate-click)
+
+This combination works without level shifting devices at 400kHz I2C clock rate.
+
+* Arduino UNO r3, MAX30100 custom board with 4.7kOhm pullups to 5V to SDA, SCL, INT
+
+As above, working at 400kHz
+
+* Sparkfun Arduino Pro 328p 8MHz 3.3V, Mikroelektronika Heart rate click
+
+Even if this combination works (MAX30100 communication), the slower clock speed fails to deliver
+the required performance deadlines for a 100Hz sampling.
