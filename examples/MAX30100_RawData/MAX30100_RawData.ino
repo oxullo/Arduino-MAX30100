@@ -23,9 +23,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <Wire.h>
 #include "MAX30100.h"
 
-// Tweakable parameters
-// Sampling and polling frequency must be set consistently
-#define POLL_PERIOD_US                      1E06 / 100
+// Sampling is tightly related to the dynamic range of the ADC.
+// refer to the datasheet for further info
 #define SAMPLING_RATE                       MAX30100_SAMPRATE_100HZ
 
 // The LEDs currents must be set to a level that avoids clipping and maximises the
@@ -42,7 +41,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 // Instantiate a MAX30100 sensor class
 MAX30100 sensor;
-uint32_t tsLastPollUs = 0;
 
 void setup()
 {
@@ -70,14 +68,13 @@ void setup()
 
 void loop()
 {
-    // Using this construct instead of a delay allows to account for the time
-    // spent sending data thru the serial and tighten the timings with the sampling
-    if (micros() < tsLastPollUs || micros() - tsLastPollUs > POLL_PERIOD_US) {
-        sensor.update();
-        tsLastPollUs = micros();
+    uint16_t ir, red;
 
-        Serial.print(sensor.rawIRValue);
+    sensor.update();
+
+    while (sensor.getRawValues(&ir, &red)) {
+        Serial.print(ir);
         Serial.print('\t');
-        Serial.println(sensor.rawRedValue);
+        Serial.println(red);
     }
 }

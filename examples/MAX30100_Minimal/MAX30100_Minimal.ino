@@ -73,9 +73,7 @@ void loop()
         Serial.print(pox.getHeartRate());
         Serial.print("bpm / SpO2:");
         Serial.print(pox.getSpO2());
-        Serial.print("% / temp:");
-        Serial.print(pox.getTemperature());
-        Serial.println("C");
+        Serial.println("%");
 
         tsLastReport = millis();
     }

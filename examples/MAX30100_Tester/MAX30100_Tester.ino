@@ -86,21 +86,35 @@ void setup()
             for(;;);
         }
     }
+
+    float temperature = sensor.retrieveTemperature();
     Serial.print("done, temp=");
-    Serial.print(sensor.retrieveTemperature());
+    Serial.print(temperature);
     Serial.println("C");
 
-    Serial.println("All test pass. Press any key to go into sampling loop mode");
+    if (temperature < 5) {
+        Serial.println("WARNING: Temperature probe reported an odd value");
+    } else {
+        Serial.println("All test pass.");
+    }
+
+    Serial.println();
+    Serial.println("Press any key to go into sampling loop mode");
     while (!Serial.available());
+
+    sensor.resetFifo();
 }
 
 void loop()
 {
-    sensor.update();
-    Serial.print("RED=");
-    Serial.print(sensor.rawRedValue);
-    Serial.print(" IR=");
-    Serial.println(sensor.rawIRValue);
+    uint16_t ir, red;
 
-    delay(1.0/100);
+    sensor.update();
+
+    while (sensor.getRawValues(&ir, &red)) {
+        Serial.print("IR=");
+        Serial.print(ir);
+        Serial.print(" RED=");
+        Serial.println(red);
+    }
 }
