@@ -106,4 +106,6 @@ typedef enum LEDCurrent {
 // Part ID register
 #define MAX30100_REG_PART_ID                    0xff
 
+#define MAX30100_FIFO_DEPTH                     0x10
+
 #endif

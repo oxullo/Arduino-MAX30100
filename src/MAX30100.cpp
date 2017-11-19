@@ -79,6 +79,20 @@ void MAX30100::update()
     readFifoData();
 }
 
+bool MAX30100::getRawValues(uint16_t *ir, uint16_t *red)
+{
+    if (!readoutsBuffer.isEmpty()) {
+        SensorReadout readout = readoutsBuffer.pop();
+
+        *ir = readout.ir;
+        *red = readout.red;
+
+        return true;
+    } else {
+        return false;
+    }
+}
+
 uint8_t MAX30100::readRegister(uint8_t address)
 {
     Wire.beginTransmission(MAX30100_I2C_ADDRESS);
@@ -112,13 +126,21 @@ void MAX30100::burstRead(uint8_t baseAddress, uint8_t *buffer, uint8_t length)
 
 void MAX30100::readFifoData()
 {
-    uint8_t buffer[4];
+    uint8_t buffer[MAX30100_FIFO_DEPTH*4];
+    uint8_t toRead;
 
-    burstRead(MAX30100_REG_FIFO_DATA, buffer, 4);
+    toRead = (readRegister(MAX30100_REG_FIFO_WRITE_POINTER) - readRegister(MAX30100_REG_FIFO_READ_POINTER)) & (MAX30100_FIFO_DEPTH-1);
 
-    // Warning: the values are always left-aligned
-    rawIRValue = (buffer[0] << 8) | buffer[1];
-    rawRedValue = (buffer[2] << 8) | buffer[3];
+    if (toRead) {
+        burstRead(MAX30100_REG_FIFO_DATA, buffer, 4 * toRead);
+
+        for (uint8_t i=0 ; i < toRead ; ++i) {
+            // Warning: the values are always left-aligned
+            readoutsBuffer.push({
+                    .ir=(uint16_t)((buffer[i*4] << 8) | buffer[i*4 + 1]),
+                    .red=(uint16_t)((buffer[i*4 + 2] << 8) | buffer[i*4 + 3])});
+        }
+    }
 }
 
 void MAX30100::startTemperatureSampling()

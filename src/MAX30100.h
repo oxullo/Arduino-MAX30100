@@ -21,6 +21,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <stdint.h>
 
+#define CIRCULAR_BUFFER_XS
+#include "CircularBuffer.h"
 #include "MAX30100_Registers.h"
 
 #define DEFAULT_MODE                MAX30100_MODE_HRONLY
@@ -29,8 +31,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define DEFAULT_RED_LED_CURRENT     MAX30100_LED_CURR_50MA
 #define DEFAULT_IR_LED_CURRENT      MAX30100_LED_CURR_50MA
 #define EXPECTED_PART_ID            0x11
+#define RINGBUFFER_SIZE             16
 
 #define I2C_BUS_SPEED               400000UL
+
+typedef struct {
+    uint16_t ir;
+    uint16_t red;
+} SensorReadout;
 
 class MAX30100 {
 public:
@@ -42,6 +50,7 @@ public:
     void setLedsCurrent(LEDCurrent irLedCurrent, LEDCurrent redLedCurrent);
     void setHighresModeEnabled(bool enabled);
     void update();
+    bool getRawValues(uint16_t *ir, uint16_t *red);
     void startTemperatureSampling();
     bool isTemperatureReady();
     float retrieveTemperature();
@@ -49,10 +58,13 @@ public:
     void resume();
     uint8_t getPartId();
 
+    // TODO: KILL!
     uint16_t rawIRValue;
     uint16_t rawRedValue;
 
 private:
+    CircularBuffer<SensorReadout, RINGBUFFER_SIZE> readoutsBuffer;
+
     uint8_t readRegister(uint8_t address);
     void writeRegister(uint8_t address, uint8_t data);
     void burstRead(uint8_t baseAddress, uint8_t *buffer, uint8_t length);
