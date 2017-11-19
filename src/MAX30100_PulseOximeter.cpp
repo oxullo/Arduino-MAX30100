@@ -25,7 +25,6 @@ PulseOximeter::PulseOximeter() :
     state(PULSEOXIMETER_STATE_INIT),
     tsFirstBeatDetected(0),
     tsLastBeatDetected(0),
-    tsLastSample(0),
     tsLastBiasCheck(0),
     tsLastCurrentAdjustment(0),
     tsLastTemperaturePoll(0),
@@ -67,6 +66,8 @@ bool PulseOximeter::begin(PulseOximeterDebuggingMode debuggingMode_)
 
 void PulseOximeter::update()
 {
+    hrm.update();
+
     checkSample();
     checkCurrentBias();
     checkTemperature();
@@ -115,11 +116,12 @@ void PulseOximeter::resume()
 
 void PulseOximeter::checkSample()
 {
-    if (micros() < tsLastSample || micros() - tsLastSample >= 1.0 / SAMPLING_FREQUENCY * 1000000.0) {
-        tsLastSample = micros();
-        hrm.update();
-        float irACValue = irDCRemover.step(hrm.rawIRValue);
-        float redACValue = redDCRemover.step(hrm.rawRedValue);
+    uint16_t rawIRValue, rawRedValue;
+
+    // Dequeue all available samples, they're properly timed by the HRM
+    while (hrm.getRawValues(&rawIRValue, &rawRedValue)) {
+        float irACValue = irDCRemover.step(rawIRValue);
+        float redACValue = redDCRemover.step(rawRedValue);
 
         // The signal fed to the beat detector is mirrored since the cleanest monotonic spike is below zero
         float filteredPulseValue = lpf.step(-irACValue);
@@ -136,9 +138,9 @@ void PulseOximeter::checkSample()
         switch (debuggingMode) {
             case PULSEOXIMETER_DEBUGGINGMODE_RAW_VALUES:
                 Serial.print("R:");
-                Serial.print(hrm.rawIRValue);
+                Serial.print(rawIRValue);
                 Serial.print(",");
-                Serial.println(hrm.rawRedValue);
+                Serial.println(rawRedValue);
                 break;
 
             case PULSEOXIMETER_DEBUGGINGMODE_AC_VALUES:

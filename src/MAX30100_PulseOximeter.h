@@ -71,7 +71,6 @@ private:
     PulseOximeterDebuggingMode debuggingMode;
     uint32_t tsFirstBeatDetected;
     uint32_t tsLastBeatDetected;
-    uint32_t tsLastSample;
     uint32_t tsLastBiasCheck;
     uint32_t tsLastCurrentAdjustment;
     uint32_t tsLastTemperaturePoll;

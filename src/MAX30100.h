@@ -58,10 +58,6 @@ public:
     void resume();
     uint8_t getPartId();
 
-    // TODO: KILL!
-    uint16_t rawIRValue;
-    uint16_t rawRedValue;
-
 private:
     CircularBuffer<SensorReadout, RINGBUFFER_SIZE> readoutsBuffer;
 
