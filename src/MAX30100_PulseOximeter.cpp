@@ -69,7 +69,9 @@ void PulseOximeter::update()
 {
     checkSample();
     checkCurrentBias();
-    checkTemperature();
+    // Disabled since it appears to wreak havoc in the bpm detector
+    // Reference: issue #32
+    // checkTemperature();
 }
 
 float PulseOximeter::getHeartRate()
