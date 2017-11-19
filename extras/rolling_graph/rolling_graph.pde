@@ -36,6 +36,7 @@ final color[] colors = {color(0, 0, 0), color(255, 0, 0), color(0, 255, 0), colo
 float[][] series = new float[CHANNELS][WIDTH];
 float heartRate = 0;
 int spO2 = 0;
+int redLedCurrentIndex = 0;
 boolean beatDetected = false;
 int ptr = 0;
 
@@ -121,6 +122,7 @@ void draw ()
   
   text("Rate: " + heartRate, 200, 8);
   text("SpO2: " + spO2 + "%", 200, 18);
+  text("RLI: " + redLedCurrentIndex, 200, 28);
 }
   
 void serialEvent (Serial myPort)
@@ -153,5 +155,7 @@ void serialEvent (Serial myPort)
     println(sLine);
   } else if (sLine.substring(0, 2).equals("O:")) {
     spO2 = int(float(sLine.substring(2)));
+  } else if (sLine.substring(0, 2).equals("I:")) {
+    redLedCurrentIndex = int(float(sLine.substring(2)));
   }
 }

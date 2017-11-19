@@ -182,6 +182,11 @@ void PulseOximeter::checkCurrentBias()
         if (changed) {
             hrm.setLedsCurrent(irLedCurrent, (LEDCurrent)redLedCurrentIndex);
             tsLastCurrentAdjustment = millis();
+
+            if (debuggingMode != PULSEOXIMETER_DEBUGGINGMODE_NONE) {
+                Serial.print("I:");
+                Serial.println(redLedCurrentIndex);
+            }
         }
 
         tsLastBiasCheck = millis();
