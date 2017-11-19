@@ -93,6 +93,13 @@ bool MAX30100::getRawValues(uint16_t *ir, uint16_t *red)
     }
 }
 
+void MAX30100::resetFifo()
+{
+    writeRegister(MAX30100_REG_FIFO_WRITE_POINTER, 0);
+    writeRegister(MAX30100_REG_FIFO_READ_POINTER, 0);
+    writeRegister(MAX30100_REG_FIFO_OVERFLOW_COUNTER, 0);
+}
+
 uint8_t MAX30100::readRegister(uint8_t address)
 {
     Wire.beginTransmission(MAX30100_I2C_ADDRESS);

@@ -51,6 +51,7 @@ public:
     void setHighresModeEnabled(bool enabled);
     void update();
     bool getRawValues(uint16_t *ir, uint16_t *red);
+    void resetFifo();
     void startTemperatureSampling();
     bool isTemperatureReady();
     float retrieveTemperature();
