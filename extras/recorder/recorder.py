@@ -58,12 +58,17 @@ class SerialStreamer(threading.Thread):
     def _poll(self):
         line = self._s.readline().strip()
         if line:
-            try:
-                a, b = [int(v) for v in line.split('\t')]
-            except Exception, e:
-                logger.exception(e)
+            spl = line.split('\t')
 
-            self._q.put((self._get_time_offs(), a, b))
+            if len(spl) != 2:
+                logger.warning('Ignoring line: %s' % line)
+            else:
+                try:
+                    a, b = [int(v) for v in spl]
+                except Exception, e:
+                    logger.exception(e)
+                else:
+                    self._q.put((self._get_time_offs(), a, b))
 
     def _get_time_offs(self):
         return int((time.time() - self._time_started) * 1000.0)
@@ -76,10 +81,12 @@ def parse_args():
     parser.add_argument('--holdoff', type=float, default=1.5,
                         help='Settlement time after connection')
     parser.add_argument('--debug', action='store_true', help='Be verbose')
+    parser.add_argument('--samples', type=int, default=0,
+                        help='Define the number of samples to be fetched, 0 to infinite')
 
     return parser.parse_args()
 
-def gather(streamer, fp):
+def gather(streamer, fp, maxsamples):
     samples_count = 0
 
     while True:
@@ -89,6 +96,11 @@ def gather(streamer, fp):
         for sample in samples:
             fp.write('%d\t%d\t%d\n' % sample)
         logger.info('Gathered %d samples' % samples_count)
+
+        if samples_count > maxsamples:
+            logging.info('Acquired %d samples (requested: %d), stopping' %
+                         (samples_count, maxsamples))
+            return
 
         time.sleep(1)
 
@@ -108,7 +120,7 @@ def run():
     fp = open(args.outfile, 'w')
 
     try:
-        gather(streamer, fp)
+        gather(streamer, fp, args.samples)
     except KeyboardInterrupt:
         logger.info('Terminating')
     finally:
