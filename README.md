@@ -137,3 +137,10 @@ As above, working at 400kHz
 
 Even if this combination works (MAX30100 communication), the slower clock speed fails to deliver
 the required performance deadlines for a 100Hz sampling.
+
+## Troubled breakouts
+
+This breakout board: http://www.sunrom.com/m/5337
+
+Has pullups on the Vdd (1.8V) line. To make it work, the three 4k7 pullups must be
+desoldered and external 4.7k pullups to Vcc of the MCU must be added.
