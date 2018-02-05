@@ -20,6 +20,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "MAX30100_BeatDetector.h"
 
+#define min(a,b) \
+   ({ __typeof__ (a) _a = (a); \
+       __typeof__ (b) _b = (b); \
+     _a < _b ? _a : _b; })
+
 BeatDetector::BeatDetector() :
     state(BEATDETECTOR_STATE_INIT),
     threshold(BEATDETECTOR_MIN_THRESHOLD),
