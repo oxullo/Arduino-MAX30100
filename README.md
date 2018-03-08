@@ -11,6 +11,13 @@ Arduino library for the Maxim Integrated MAX30100 oximetry / heart rate sensor.
 The library is offered only for educational purposes and it is not meant for medical uses.
 Use it at your sole risk.
 
+## Notes
+
+Maxim integrated stopped the production of the MAX30100 in favor of MAX30101 and MAX30102.
+Therefore this library won't be seeing any further improvement, besides fixes.
+
+*IMPORTANT: when submitting issues, make sure to fill ALL the fields indicated in the template text of the issue. The issue will be marked as invalid and closed immediately otherwise.*
+
 ## Hardware
 
 This library has been tested with the MikroElektronika Heart rate click daughterboard:
