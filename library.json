@@ -14,7 +14,7 @@
         "type": "git",
         "url": "https://github.com/oxullo/Arduino-MAX30100"
     },
-    "version": "1.2.0",
+    "version": "1.2.1",
     "frameworks": "arduino",
     "platforms": "atmelavr"
 }
