@@ -19,69 +19,140 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef MAX30102_PULSEOXIMETER_H
-#define MAX30102_PULSEOXIMETER_H
+#ifndef MAX30102_REGISTERS_H
+#define MAX30102_REGISTERS_H
 
-#define SAMPLING_FREQUENCY                  100
-#define CURRENT_ADJUSTMENT_PERIOD_MS        500
-#define DEFAULT_IR_LED_CURRENT              0xFF //51mA 
-#define RED_LED_CURRENT_START               0x88 //27mA
-#define DC_REMOVER_ALPHA                    0.95
+#define MAX30102_I2C_ADDRESS                    0x57
 
-#include <stdint.h>
+// Interrupt status register (RO)
+#define MAX30102_REG_INTERRUPT_STATUS_A         0x00
+#define MAX30102_IS_PWR_RDY                     (1 << 0)
+#define MAX30102_IS_ALC_OVF                     (1 << 5)
+#define MAX30102_IS_PPG_RDY                     (1 << 6)
+#define MAX30102_IS_A_FULL                      (1 << 7)
 
-#include "MAX30102.h"
-#include "MAX30102_BeatDetector.h"
-#include "MAX30102_Filters.h"
-#include "MAX30102_SpO2Calculator.h"
+// Interrupt status register (R1)
+#define MAX30102_REG_INTERRUPT_STATUS_B         0x01
+#define MAX30102_IS_TEMP_RDY                    (1 << 1)
 
-typedef enum PulseOximeterState {
-    PULSEOXIMETER_STATE_INIT,
-    PULSEOXIMETER_STATE_IDLE,
-    PULSEOXIMETER_STATE_DETECTING
-} PulseOximeterState;
+// Interrupt enable register E1
+#define MAX30102_REG_INTERRUPT_ENABLE_A         0x02
+#define MAX30102_IE_ENB_ALC_OVF                 (1 << 5)
+#define MAX30102_IE_ENB_PPG_RDY                 (1 << 6)
+#define MAX30102_IE_ENB_A_FULL                  (1 << 7)
 
-typedef enum PulseOximeterDebuggingMode {
-    PULSEOXIMETER_DEBUGGINGMODE_NONE,
-    PULSEOXIMETER_DEBUGGINGMODE_RAW_VALUES,
-    PULSEOXIMETER_DEBUGGINGMODE_AC_VALUES,
-    PULSEOXIMETER_DEBUGGINGMODE_PULSEDETECT
-} PulseOximeterDebuggingMode;
+// Interrupt enable register E2
+#define MAX30102_REG_INTERRUPT_ENABLE_B         0x03
+#define MAX30102_IE_ENB_TEMP_RDY                (1 << 1)
+
+// FIFO control and data registers
+#define MAX30102_REG_FIFO_WRITE_POINTER         0x04
+#define MAX30102_REG_FIFO_OVERFLOW_COUNTER      0x05
+#define MAX30102_REG_FIFO_READ_POINTER          0x06
+#define MAX30102_REG_FIFO_DATA                  0x07  // Burst read does not autoincrement addr
+
+//FIFO config registers
+#define MAX30102_REG_FIFO_CONFIG                0x08
+#define MAX30102_FC_FIFO_ROLLOVER_EN			1 << 4
+typedef enum FIFO_A_Full {
+	MAX30102_FC_FIFO_A_FULL_0	= 0x0,
+	MAX30102_FC_FIFO_A_FULL_1	= 0x1,
+	MAX30102_FC_FIFO_A_FULL_2	= 0x2,
+	MAX30102_FC_FIFO_A_FULL_3	= 0x3,
+	MAX30102_FC_FIFO_A_FULL_4	= 0x4,
+	MAX30102_FC_FIFO_A_FULL_5	= 0x5,
+	MAX30102_FC_FIFO_A_FULL_6	= 0x6,
+	MAX30102_FC_FIFO_A_FULL_7	= 0x7,
+	MAX30102_FC_FIFO_A_FULL_8	= 0x8,
+	MAX30102_FC_FIFO_A_FULL_9	= 0x9,
+	MAX30102_FC_FIFO_A_FULL_10	= 0xA,
+	MAX30102_FC_FIFO_A_FULL_11	= 0xB,
+	MAX30102_FC_FIFO_A_FULL_12	= 0xC,
+	MAX30102_FC_FIFO_A_FULL_15	= 0xF,
+	MAX30102_FC_FIFO_A_FULL_13	= 0xD,
+	MAX30102_FC_FIFO_A_FULL_14	= 0xE
+	
+} FIFO_A_Full;
+
+typedef enum SampleAverage {
+	MAX30102_SMP_AVE_1			= 0x0,
+	MAX30102_SMP_AVE_2			= 0x1,
+	MAX30102_SMP_AVE_4			= 0x2,
+	MAX30102_SMP_AVE_8			= 0x3,
+	MAX30102_SMP_AVE_16			= 0x4,
+	MAX30102_SMP_AVE_32			= 0x5
+} SampleAverage;
 
 
-class PulseOximeter {
-public:
-    PulseOximeter();
+// Mode Configuration register
+#define MAX30102_REG_MODE_CONFIGURATION         0x09
+#define MAX30102_MC_RESET                       (1 << 6)
+#define MAX30102_MC_SHDN                        (1 << 7)
+typedef enum Mode {
+    MAX30102_MODE_HRONLY    = 0x02,
+    MAX30102_MODE_SPO2_HR   = 0x03,
+	MAX30102_MODE_MULTI   	= 0x07
+} Mode;
 
-    bool begin(PulseOximeterDebuggingMode debuggingMode_=PULSEOXIMETER_DEBUGGINGMODE_NONE);
-    void update();
-    float getHeartRate();
-    uint8_t getSpO2();
-    uint8_t getRedLedCurrentBias();
-    void setOnBeatDetectedCallback(void (*cb)());
-    void setIRLedCurrent(uint8_t irLedCurrent);
-    void shutdown();
-    void resume();
+// SpO2 Configuration register
+// Check tables 8 and 9, p19 of the MAX30102 datasheet to see the permissible
+// combinations of sampling rates and pulse widths
+#define MAX30102_REG_SPO2_CONFIGURATION         0x0A
 
-private:
-    void checkSample();
-    void checkCurrentBias();
+typedef enum ADCRange {
+	MAX30102_ADCRange_2048		= 0x0,
+	MAX30102_ADCRange_4096		= 0x1,
+	MAX30102_ADCRange_8192		= 0x2,
+	MAX30102_ADCRange_16384		= 0x3,
+} ADCRange;
 
-    PulseOximeterState state;
-    PulseOximeterDebuggingMode debuggingMode;
-    uint32_t tsFirstBeatDetected;
-    uint32_t tsLastBeatDetected;
-    uint32_t tsLastBiasCheck;
-    uint32_t tsLastCurrentAdjustment;
-    BeatDetector beatDetector;
-    DCRemover irDCRemover;
-    DCRemover redDCRemover;
-    FilterBuLp1 lpf;
-    uint8_t redLedCurrentIndex;
-    uint8_t irLedCurrent;
-    SpO2Calculator spO2calculator;
-    MAX30102 hrm;
+typedef enum SamplingRate {
+    MAX30102_SAMPRATE_50HZ      = 0x00,
+	MAX30102_SAMPRATE_100HZ     = 0x01,
+	MAX30102_SAMPRATE_167HZ     = 0x02,
+	MAX30102_SAMPRATE_200HZ     = 0x03,
+	MAX30102_SAMPRATE_400HZ     = 0x04,
+	MAX30102_SAMPRATE_600HZ     = 0x05,
+	MAX30102_SAMPRATE_800HZ     = 0x06,
+	MAX30102_SAMPRATE_1000HZ    = 0x07
+} SamplingRate;
 
-    void (*onBeatDetected)();
-};
+typedef enum LEDPulseWidth {
+    MAX30102_SPC_PW_69US_15BITS    	= 0x00,
+    MAX30102_SPC_PW_118US_16BITS    = 0x01,
+    MAX30102_SPC_PW_215US_17BITS    = 0x02,
+    MAX30102_SPC_PW_411US_18BITS   	= 0x03
+} LEDPulseWidth;
+
+// LED Configuration registers
+#define MAX30102_REG_LED_RED_PA          0x0C
+#define MAX30102_REG_LED_IR_PA           0x0D
+
+// Multi LED Mode Control registers, refer page 21 of datasheet
+#define MAX30102_REG_MULTI_LED_CTRL_1AND2		0x11
+#define MAX30102_REG_MULTI_LED_CTRL_3AND4		0x12
+
+typedef enum SlotSetting {
+	MAX30102_SLOT_SETTING_OFF		= 0x0,
+	MAX30102_SLOT_SETTING_RED		= 0x1,
+	MAX30102_SLOT_SETTING_IR		= 0x1
+} SlotSetting;	
+
+                      
+// Temperature integer part register
+#define MAX30102_REG_TEMPERATURE_DATA_INT       0x1F
+// Temperature fractional part register
+#define MAX30102_REG_TEMPERATURE_DATA_FRAC      0x20
+
+//Temperature emable
+#define MAX30102_REG_TEMP_CONFIG				0x21
+#define MAX30102_TC_TEMP_EN						1 << 0
+
+// Revision ID register (RO)
+#define MAX30102_REG_REVISION_ID                0xfe
+// Part ID register
+#define MAX30102_REG_PART_ID                    0xff
+
+#define MAX30102_FIFO_DEPTH                     0x20
+
 #endif
