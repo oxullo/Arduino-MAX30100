@@ -1,5 +1,5 @@
 /*
-Arduino-MAX30100 oximetry / heart rate integrated sensor library
+Arduino-MAX30102 oximetry / heart rate integrated sensor library
 Copyright (C) 2016  OXullo Intersecans <x@brainrapers.org>
 
 This program is free software: you can redistribute it and/or modify
@@ -16,8 +16,8 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef MAX30100_SPO2CALCULATOR_H
-#define MAX30100_SPO2CALCULATOR_H
+#ifndef MAX30102_SPO2CALCULATOR_H
+#define MAX30102_SPO2CALCULATOR_H
 
 #include <stdint.h>
 
