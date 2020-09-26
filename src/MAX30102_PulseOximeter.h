@@ -1,6 +1,9 @@
 /*
-Arduino-MAX30100 oximetry / heart rate integrated sensor library
-Copyright (C) 2016  OXullo Intersecans <x@brainrapers.org>
+Arduino-MAX30102 oximetry / heart rate integrated sensor library by Shivam Gupta (gupta.shivam1996@gmail.com)
+
+Based on MAX30100 library, Copyright (C) 2016  OXullo Intersecans <x@brainrapers.org>
+All alogrithms and methods used are from the above author,
+I have only modified this enough to make it work with the new MAX30102 sensor.
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -16,21 +19,21 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef MAX30100_PULSEOXIMETER_H
-#define MAX30100_PULSEOXIMETER_H
+#ifndef MAX30102_PULSEOXIMETER_H
+#define MAX30102_PULSEOXIMETER_H
 
 #define SAMPLING_FREQUENCY                  100
 #define CURRENT_ADJUSTMENT_PERIOD_MS        500
-#define DEFAULT_IR_LED_CURRENT              MAX30100_LED_CURR_50MA
-#define RED_LED_CURRENT_START               MAX30100_LED_CURR_27_1MA
+#define DEFAULT_IR_LED_CURRENT              0xFF //51mA 
+#define RED_LED_CURRENT_START               0x88 //27mA
 #define DC_REMOVER_ALPHA                    0.95
 
 #include <stdint.h>
 
-#include "MAX30100.h"
-#include "MAX30100_BeatDetector.h"
-#include "MAX30100_Filters.h"
-#include "MAX30100_SpO2Calculator.h"
+#include "MAX30102.h"
+#include "MAX30102_BeatDetector.h"
+#include "MAX30102_Filters.h"
+#include "MAX30102_SpO2Calculator.h"
 
 typedef enum PulseOximeterState {
     PULSEOXIMETER_STATE_INIT,
@@ -56,7 +59,7 @@ public:
     uint8_t getSpO2();
     uint8_t getRedLedCurrentBias();
     void setOnBeatDetectedCallback(void (*cb)());
-    void setIRLedCurrent(LEDCurrent irLedCurrent);
+    void setIRLedCurrent(uint8_t irLedCurrent);
     void shutdown();
     void resume();
 
@@ -75,9 +78,9 @@ private:
     DCRemover redDCRemover;
     FilterBuLp1 lpf;
     uint8_t redLedCurrentIndex;
-    LEDCurrent irLedCurrent;
+    uint8_t irLedCurrent;
     SpO2Calculator spO2calculator;
-    MAX30100 hrm;
+    MAX30102 hrm;
 
     void (*onBeatDetected)();
 };
