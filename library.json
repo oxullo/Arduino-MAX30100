@@ -1,18 +1,18 @@
 {
-    "name": "MAX30100lib",
-    "keywords": "pulse,oximetry,spo2,max30100,sensor,i2c",
-    "description": "Maxim-IC MAX30100 heart-rate sensor driver and pulse-oximetry components",
+    "name": "MAX30102lib",
+    "keywords": "pulse,oximetry,spo2,max30102,sensor,i2c",
+    "description": "Maxim-IC MAX30102 heart-rate sensor driver and pulse-oximetry components",
     "authors":
     {
-        "name": "OXullo Intersecans",
-        "email": "x@brainrapers.org",
-        "url": "https://github.com/oxullo/",
+        "name": "Shivam Gupta",
+        "email": "gupta.shivam1996@gmail.com",
+        "url": "https://github.com/thewiseguyshivam",
 	"maintainer": true
     },
     "repository":
     {
         "type": "git",
-        "url": "https://github.com/oxullo/Arduino-MAX30100"
+        "url": "https://github.com/oxullo/Arduino-MAX30102"
     },
     "version": "1.2.1",
     "frameworks": "arduino",

@@ -7,10 +7,10 @@ This tool pipes a raw session from the sensor into a file for further analysis.
 The recorder and the analysis notebook require python and analysis libraries.
 Virtualenv is warmly suggested.
 
-* Flash the example firmware MAX30100_RawData to the microcontroller board
+* Flash the example firmware MAX30102_RawData to the microcontroller board
 * Install the required libraries
-    $ virtualenv max30100env
-    $ source max30100env/bin/activate
+    $ virtualenv max30102env
+    $ source max30102env/bin/activate
     $ pip install -Ur requirements.txt
 * Ensure the board is connected
 

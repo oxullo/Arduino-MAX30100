@@ -12,7 +12,7 @@ import serial
 
 #
 # Data logger
-# to be used in conjunction with the MAX30100_RawData example
+# to be used in conjunction with the MAX30102_RawData example
 #
 
 

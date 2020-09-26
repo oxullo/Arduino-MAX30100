@@ -1,6 +1,9 @@
 /*
-Arduino-MAX30100 oximetry / heart rate integrated sensor library
-Copyright (C) 2016  OXullo Intersecans <x@brainrapers.org>
+Arduino-MAX30102 oximetry / heart rate integrated sensor library by Shivam Gupta (gupta.shivam1996@gmail.com)
+
+Based on MAX30100 library, Copyright (C) 2016  OXullo Intersecans <x@brainrapers.org>
+All alogrithms and methods used are from the above author,
+I have only modified this enough to make it work with the new MAX30102 sensor.Copyright (C) 2016  OXullo Intersecans <x@brainrapers.org>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -16,7 +19,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-// Grapher helper for the Arduino MAX30100 library
+// Grapher helper for the Arduino MAX30102 library
 
 import processing.serial.*;
 
@@ -24,7 +27,7 @@ import processing.serial.*;
 // set this to -1 to enable the auto range mode
 final int ABSMAX = 800;
 // Adjust to the serial port. Under OSX, UNO platforms and alike are auto-detected.
-final String serialPort = "/dev/tty.usbmodemFD13131";
+final String serialPort = "COM3";
 
 
 final int WIDTH = 1200;
