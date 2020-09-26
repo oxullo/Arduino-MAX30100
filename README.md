@@ -16,6 +16,7 @@ Use it at your sole risk.
 This library has been tested with two different breakout boards for MAX30102
 
 https://www.amazon.in/xcluma-MAX30102-Upgraded-Ultra-Low-Compatible/dp/B07TZCNG2G/ref=sr_1_1?crid=3H93UW42TRQWY&dchild=1&keywords=xcluma+max30102&qid=1601127280&sprefix=xcluma+max%2Caps%2C299&sr=8-1
+
 https://robokits.co.in/sensors/heart-beat-sensor/max30102-oximetry-sensor-module
 
 along with an Arduino UNO r3. Any Arduino supporting the Wire library should work.
