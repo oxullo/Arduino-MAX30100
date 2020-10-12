@@ -2,7 +2,17 @@
 
 Arduino library for the Maxim Integrated MAX30102 oximetry / heart rate sensor.
 
-![MAX30102](https://www.amazon.in/xcluma-MAX30102-Upgraded-Ultra-Low-Compatible/dp/B07TZCNG2G/ref=sr_1_1?crid=3H93UW42TRQWY&dchild=1&keywords=xcluma+max30102&qid=1601127280&sprefix=xcluma+max%2Caps%2C299&sr=8-1)
+
+Based on a library written for the older MAX30100 sensor by OXullo Intersecans <x@brainrapers.org> in 2016. 
+It has been ported to work with MAX30102 sensor breakouts, and new functions have been added to the library such as channel control,
+so that all available functions of the device can be accessed with ease.
+
+All algorithms and example codes are written by the above author [OXullo Intersecans <x@brainrapers.org>], this is a fork building on that to extend support.
+Original Library can be found here : https://github.com/oxullo/Arduino-MAX30100
+
+vvvvvvvvvvvvvv
+Carried over content, changed to fit the experiments I performed:
+vvvvvvvvvvvvvv
 
 ## Disclaimer
 
@@ -18,6 +28,8 @@ This library has been tested with two different breakout boards for MAX30102
 https://www.amazon.in/xcluma-MAX30102-Upgraded-Ultra-Low-Compatible/dp/B07TZCNG2G/ref=sr_1_1?crid=3H93UW42TRQWY&dchild=1&keywords=xcluma+max30102&qid=1601127280&sprefix=xcluma+max%2Caps%2C299&sr=8-1
 
 https://robokits.co.in/sensors/heart-beat-sensor/max30102-oximetry-sensor-module
+
+https://in.element14.com/webapp/wcs/stores/servlet/ProductDisplay?catalogId=15001&langId=91&productSeoURL=maxim-integrated-products&storeId=10186&partNumber=2627165&krypto=R4I%2BFWxL8JW4fRaTcbt%2BHuLRKF64g5pcACQC6j4AdeuGGnr%2F0z4QoAgzJYIFu516Z9ZklPwUROYW5qFA%2BXaDmA%3D%3D
 
 along with an Arduino UNO r3. Any Arduino supporting the Wire library should work.
 
@@ -127,18 +139,7 @@ Both tools have additional information on the README.md in their respective dire
 
 ## Tested devices
 
-* Arduino UNO r3, Mikroelektronika Heart rate click (https://shop.mikroe.com/heart-rate-click)
-
-This combination works without level shifting devices at 400kHz I2C clock rate.
-
-* Arduino UNO r3, MAX30102 custom board with 4.7kOhm pullups to 5V to SDA, SCL, INT
-
-As above, working at 400kHz
-
-* Sparkfun Arduino Pro 328p 8MHz 3.3V, Mikroelektronika Heart rate click
-
-Even if this combination works (MAX30102 communication), the slower clock speed fails to deliver
-the required performance deadlines for a 100Hz sampling.
+#todo
 
 ## Troubled breakouts
 
