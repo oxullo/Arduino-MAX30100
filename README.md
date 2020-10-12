@@ -1,6 +1,6 @@
 # Arduino-MAX30102
 
-Arduino library for the Maxim Integrated MAX30102 oximetry / heart rate sensor.
+Arduino library for the Maxim Integrated MAX30102 oximetry / heart rate sensor by Shivam Gupta <gupta.shivam1996@gmail.com>
 
 
 Based on a library written for the older MAX30100 sensor by OXullo Intersecans <x@brainrapers.org> in 2016. 
