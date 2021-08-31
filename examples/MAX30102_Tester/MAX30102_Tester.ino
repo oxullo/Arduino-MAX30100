@@ -1,6 +1,9 @@
 /*
-Arduino-MAX30100 oximetry / heart rate integrated sensor library
-Copyright (C) 2017  OXullo Intersecans <x@brainrapers.org>
+Arduino-MAX30102 oximetry / heart rate integrated sensor library by Shivam Gupta (gupta.shivam1996@gmail.com)
+
+Based on MAX30100 library, Copyright (C) 2016  OXullo Intersecans <x@brainrapers.org>
+All alogrithms and methods used are from the above author,
+I have only modified this enough to make it work with the new MAX30102 sensor.
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -21,15 +24,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // any of the tests running fail
 
 #include <Wire.h>
-#include "MAX30100.h"
+#include "MAX30102.h"
 
-MAX30100 sensor;
+MAX30102 sensor;
 
 void setup()
 {
     Serial.begin(115200);
 
-    Serial.print("Initializing MAX30100..");
+    Serial.print("Initializing MAX30102..");
 
     if (!sensor.begin()) {
         Serial.print("FAILED: ");
@@ -50,17 +53,20 @@ void setup()
     }
 
     Serial.print("Enabling HR/SPO2 mode..");
-    sensor.setMode(MAX30100_MODE_SPO2_HR);
+    sensor.setMode(MAX30102_MODE_SPO2_HR);
     Serial.println("done.");
 
     Serial.print("Configuring LEDs biases to 50mA..");
-    sensor.setLedsCurrent(MAX30100_LED_CURR_50MA, MAX30100_LED_CURR_50MA);
+    sensor.setIRLedCurrent(0xff);
+    sensor.setRedLedCurrent(0xff);
     Serial.println("done.");
 
     delay(1000);
 
     Serial.print("Lowering the current to 7.6mA..");
-    sensor.setLedsCurrent(MAX30100_LED_CURR_7_6MA, MAX30100_LED_CURR_7_6MA);
+    sensor.setIRLedCurrent(0x26);
+    sensor.setRedLedCurrent(0x26);
+    //sensor.setLedsCurrent(MAX30102_LED_CURR_7_6MA, MAX30102_LED_CURR_7_6MA);
     Serial.println("done.");
 
     delay(1000);

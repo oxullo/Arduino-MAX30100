@@ -6,7 +6,7 @@ a visual inspection of the beat detection algorithm.
 ## Requirements
 
 * Processing 3+ (http://www.processing.org)
-* Flash the example MAX30100_Debug to the target microcontroller
+* Flash the example MAX30102_Debug to the target microcontroller
 
 ## Usage
 

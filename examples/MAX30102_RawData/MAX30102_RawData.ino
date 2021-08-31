@@ -1,6 +1,9 @@
 /*
-Arduino-MAX30100 oximetry / heart rate integrated sensor library
-Copyright (C) 2016  OXullo Intersecans <x@brainrapers.org>
+Arduino-MAX30102 oximetry / heart rate integrated sensor library by Shivam Gupta (gupta.shivam1996@gmail.com)
+
+Based on MAX30100 library, Copyright (C) 2016  OXullo Intersecans <x@brainrapers.org>
+All alogrithms and methods used are from the above author,
+I have only modified this enough to make it work with the new MAX30102 sensor.
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -21,32 +24,32 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // Use the "Serial Plotter" app from arduino IDE 1.6.7+ to plot the output
 
 #include <Wire.h>
-#include "MAX30100.h"
+#include "MAX30102.h"
 
 // Sampling is tightly related to the dynamic range of the ADC.
 // refer to the datasheet for further info
-#define SAMPLING_RATE                       MAX30100_SAMPRATE_100HZ
+#define SAMPLING_RATE                       MAX30102_SAMPRATE_100HZ
 
 // The LEDs currents must be set to a level that avoids clipping and maximises the
 // dynamic range
-#define IR_LED_CURRENT                      MAX30100_LED_CURR_50MA
-#define RED_LED_CURRENT                     MAX30100_LED_CURR_27_1MA
+#define IR_LED_CURRENT                      0xff
+#define RED_LED_CURRENT                     0x88
 
 // The pulse width of the LEDs driving determines the resolution of
 // the ADC (which is a Sigma-Delta).
-// set HIGHRES_MODE to true only when setting PULSE_WIDTH to MAX30100_SPC_PW_1600US_16BITS
-#define PULSE_WIDTH                         MAX30100_SPC_PW_1600US_16BITS
+// set HIGHRES_MODE to true only when setting PULSE_WIDTH to MAX30102_SPC_PW_1600US_16BITS
+#define PULSE_WIDTH                         MAX30102_SPC_PW_411US_18BITS
 #define HIGHRES_MODE                        true
 
 
-// Instantiate a MAX30100 sensor class
-MAX30100 sensor;
+// Instantiate a MAX30102 sensor class
+MAX30102 sensor;
 
 void setup()
 {
     Serial.begin(115200);
 
-    Serial.print("Initializing MAX30100..");
+    Serial.print("Initializing MAX30102..");
 
     // Initialize the sensor
     // Failures are generally due to an improper I2C wiring, missing power supply
@@ -59,11 +62,13 @@ void setup()
     }
 
     // Set up the wanted parameters
-    sensor.setMode(MAX30100_MODE_SPO2_HR);
-    sensor.setLedsCurrent(IR_LED_CURRENT, RED_LED_CURRENT);
+    sensor.setMode(MAX30102_MODE_SPO2_HR);
+    //sensor.setLedsCurrent(IR_LED_CURRENT, RED_LED_CURRENT);
+    sensor.setIRLedCurrent(IR_LED_CURRENT);
+    sensor.setRedLedCurrent(RED_LED_CURRENT);
     sensor.setLedsPulseWidth(PULSE_WIDTH);
     sensor.setSamplingRate(SAMPLING_RATE);
-    sensor.setHighresModeEnabled(HIGHRES_MODE);
+    sensor.setRangeADC(MAX30102_ADCRange_16384);
 }
 
 void loop()

@@ -1,6 +1,9 @@
 /*
-Arduino-MAX30100 oximetry / heart rate integrated sensor library
-Copyright (C) 2016  OXullo Intersecans <x@brainrapers.org>
+Arduino-MAX30102 oximetry / heart rate integrated sensor library by Shivam Gupta (gupta.shivam1996@gmail.com)
+
+Based on MAX30100 library, Copyright (C) 2016  OXullo Intersecans <x@brainrapers.org>
+All alogrithms and methods used are from the above author,
+I have only modified this enough to make it work with the new MAX30102 sensor.
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -17,7 +20,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include <Wire.h>
-#include "MAX30100_PulseOximeter.h"
+#include "MAX30102_PulseOximeter.h"
 
 #define REPORTING_PERIOD_MS     1000
 
@@ -53,9 +56,9 @@ void setup()
     }
 
     // The default current for the IR LED is 50mA and it could be changed
-    //   by uncommenting the following line. Check MAX30100_Registers.h for all the
+    //   by uncommenting the following line. Check MAX30102_Registers.h for all the
     //   available options.
-    // pox.setIRLedCurrent(MAX30100_LED_CURR_7_6MA);
+    // pox.setIRLedCurrent(MAX30102_LED_CURR_7_6MA);
 
     // Register a callback for the beat detection
     pox.setOnBeatDetectedCallback(onBeatDetected);

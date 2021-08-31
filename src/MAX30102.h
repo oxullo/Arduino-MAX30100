@@ -1,6 +1,9 @@
 /*
-Arduino-MAX30100 oximetry / heart rate integrated sensor library
-Copyright (C) 2016  OXullo Intersecans <x@brainrapers.org>
+Arduino-MAX30102 oximetry / heart rate integrated sensor library by Shivam Gupta (gupta.shivam1996@gmail.com)
+
+Based on MAX30100 library, Copyright (C) 2016  OXullo Intersecans <x@brainrapers.org>
+All alogrithms and methods used are from the above author,
+I have only modified this enough to make it work with the new MAX30102 sensor.
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -16,22 +19,25 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef MAX30100_H
-#define MAX30100_H
+#ifndef MAX30102_H
+#define MAX30102_H
 
 #include <stdint.h>
 
 #define CIRCULAR_BUFFER_XS
 #include "CircularBuffer.h"
-#include "MAX30100_Registers.h"
+#include "MAX30102_Registers.h"
 
-#define DEFAULT_MODE                MAX30100_MODE_HRONLY
-#define DEFAULT_SAMPLING_RATE       MAX30100_SAMPRATE_100HZ
-#define DEFAULT_PULSE_WIDTH         MAX30100_SPC_PW_1600US_16BITS
-#define DEFAULT_RED_LED_CURRENT     MAX30100_LED_CURR_50MA
-#define DEFAULT_IR_LED_CURRENT      MAX30100_LED_CURR_50MA
-#define EXPECTED_PART_ID            0x11
-#define RINGBUFFER_SIZE             16
+#define DEFAULT_MODE                MAX30102_MODE_HRONLY
+#define DEFAULT_SAMPLING_RATE       MAX30102_SAMPRATE_100HZ
+#define DEFAULT_PULSE_WIDTH         MAX30102_SPC_PW_118US_16BITS
+#define DEFAULT_RED_LED_CURRENT     0xff
+#define DEFAULT_IR_LED_CURRENT      0xff
+#define DEFAULT_ADC_RANGE			MAX30102_ADCRange_8192
+//Max30102 part ID is 0x15
+#define EXPECTED_PART_ID            0x15
+//Max30102 fifo size is 32
+#define RINGBUFFER_SIZE             32
 
 #define I2C_BUS_SPEED               400000UL
 
@@ -40,14 +46,20 @@ typedef struct {
     uint16_t red;
 } SensorReadout;
 
-class MAX30100 {
+class MAX30102 {
 public:
-    MAX30100();
+    MAX30102();
     bool begin();
     void setMode(Mode mode);
     void setLedsPulseWidth(LEDPulseWidth ledPulseWidth);
     void setSamplingRate(SamplingRate samplingRate);
-    void setLedsCurrent(LEDCurrent irLedCurrent, LEDCurrent redLedCurrent);
+	void setRangeADC(ADCRange adcRange);
+	void setRedLedCurrent(uint8_t redLedCurrent);
+	void setIRLedCurrent(uint8_t IRLedCurrent);
+    void setSlot1(SlotSetting slotsetting);
+	void setSlot2(SlotSetting slotsetting);
+	void setSlot3(SlotSetting slotsetting);
+	void setSlot4(SlotSetting slotsetting);
     void setHighresModeEnabled(bool enabled);
     void update();
     bool getRawValues(uint16_t *ir, uint16_t *red);

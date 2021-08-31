@@ -1,6 +1,9 @@
 /*
-Arduino-MAX30100 oximetry / heart rate integrated sensor library
-Copyright (C) 2016  OXullo Intersecans <x@brainrapers.org>
+Arduino-MAX30102 oximetry / heart rate integrated sensor library by Shivam Gupta (gupta.shivam1996@gmail.com)
+
+Based on MAX30100 library, Copyright (C) 2016  OXullo Intersecans <x@brainrapers.org>
+All alogrithms and methods used are from the above author,
+I have only modified this enough to make it work with the new MAX30102 sensor.
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -18,7 +21,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <Arduino.h>
 
-#include "MAX30100_PulseOximeter.h"
+#include "MAX30102_PulseOximeter.h"
 
 
 PulseOximeter::PulseOximeter() :
@@ -46,8 +49,9 @@ bool PulseOximeter::begin(PulseOximeterDebuggingMode debuggingMode_)
         return false;
     }
 
-    hrm.setMode(MAX30100_MODE_SPO2_HR);
-    hrm.setLedsCurrent(irLedCurrent, (LEDCurrent)redLedCurrentIndex);
+    hrm.setMode(MAX30102_MODE_SPO2_HR);
+    hrm.setIRLedCurrent(irLedCurrent);
+	hrm.setRedLedCurrent((uint8_t)redLedCurrentIndex);
 
     irDCRemover = DCRemover(DC_REMOVER_ALPHA);
     redDCRemover = DCRemover(DC_REMOVER_ALPHA);
@@ -85,10 +89,11 @@ void PulseOximeter::setOnBeatDetectedCallback(void (*cb)())
     onBeatDetected = cb;
 }
 
-void PulseOximeter::setIRLedCurrent(LEDCurrent irLedNewCurrent)
+void PulseOximeter::setIRLedCurrent(uint8_t irLedNewCurrent)
 {
     irLedCurrent = irLedNewCurrent;
-    hrm.setLedsCurrent(irLedCurrent, (LEDCurrent)redLedCurrentIndex);
+	hrm.setIRLedCurrent(irLedCurrent);
+	hrm.setRedLedCurrent((uint8_t)redLedCurrentIndex);
 }
 
 void PulseOximeter::shutdown()
@@ -160,7 +165,7 @@ void PulseOximeter::checkCurrentBias()
     // red and IR leds. The numbers are really magic: the less possible to avoid oscillations
     if (millis() - tsLastBiasCheck > CURRENT_ADJUSTMENT_PERIOD_MS) {
         bool changed = false;
-        if (irDCRemover.getDCW() - redDCRemover.getDCW() > 70000 && redLedCurrentIndex < MAX30100_LED_CURR_50MA) {
+        if (irDCRemover.getDCW() - redDCRemover.getDCW() > 70000 && redLedCurrentIndex < 0xff) {
             ++redLedCurrentIndex;
             changed = true;
         } else if (redDCRemover.getDCW() - irDCRemover.getDCW() > 70000 && redLedCurrentIndex > 0) {
@@ -169,7 +174,8 @@ void PulseOximeter::checkCurrentBias()
         }
 
         if (changed) {
-            hrm.setLedsCurrent(irLedCurrent, (LEDCurrent)redLedCurrentIndex);
+			hrm.setIRLedCurrent(irLedCurrent);
+			hrm.setRedLedCurrent((uint8_t)redLedCurrentIndex);
             tsLastCurrentAdjustment = millis();
 
             if (debuggingMode != PULSEOXIMETER_DEBUGGINGMODE_NONE) {
